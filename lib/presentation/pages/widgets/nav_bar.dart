@@ -139,8 +139,8 @@ class NavBar extends StatelessWidget {
                         title: StringConst.DOWNLOAD.toUpperCase(),
                         onPressed: () {
                           Functions.downloadFromAssets(
-                            "Curriculum_Jose_Daniel_Leon_Sanchez.docx",
-                            "Curriculum_Jose_Daniel_Leon_Sanchez.docx",
+                            "Resume_Jose_Daniel_Leon_Sanchez_2025.pdf",
+                            "Resume_Jose_Daniel_Leon_Sanchez_2025.pdf",
                           );
                         },
                       ),

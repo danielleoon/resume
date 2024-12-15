@@ -162,7 +162,7 @@ class StringConst {
   static String get WORK_TOGETHER =>
       _localizedValue(en: "Get in Touch", es: "Ponte en contacto conmigo");
   static String get AVAILABLE_FOR_FREELANCE => _localizedValue(
-      en: "Available for hear you", es: "Disponible para escucharte");
+      en: "Available to hear you", es: "Disponible para escucharte");
   static String get SAY_HELLO =>
       _localizedValue(en: "Say Hello", es: "Contacto");
 
