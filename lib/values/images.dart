@@ -72,9 +72,9 @@ class ImagePath {
   // Foodybite
   static const String LEANCEAF_COVER =
       "$projectsDir/LEANCEAF/LEANCEAF_COVER.png";
-  static const String LEANCEAF_1 = "$projectsDir/LEANCEAF/LEANCEAF_1.png";
-  static const String LEANCEAF_2 = "$projectsDir/LEANCEAF/LEANCEAF_2.png";
-  static const String LEANCEAF_3 = "$projectsDir/LEANCEAF/LEANCEAF_3.png";
+  static const String LEANCEAF_1 = "$projectsDir/LEANCEAF/LeanCEAF_1.png";
+  static const String LEANCEAF_2 = "$projectsDir/LEANCEAF/LeanCEAF_2.png";
+  static const String LEANCEAF_3 = "$projectsDir/LEANCEAF/LeanCEAF_3.png";
 
   // Portfolio Site V2
   static const String AERIUM_V2_COVER =
