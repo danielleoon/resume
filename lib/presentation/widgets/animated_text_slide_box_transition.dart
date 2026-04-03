@@ -61,6 +61,26 @@ class _AnimatedTextSlideBoxTransitionState
   @override
   void initState() {
     super.initState();
+    _configureAnimations();
+  }
+
+  @override
+  void didUpdateWidget(covariant AnimatedTextSlideBoxTransition oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.controller != widget.controller ||
+        oldWidget.text != widget.text ||
+        oldWidget.textStyle != widget.textStyle ||
+        oldWidget.width != widget.width ||
+        oldWidget.maxLines != widget.maxLines ||
+        oldWidget.widthFactor != widget.widthFactor ||
+        oldWidget.heightFactor != widget.heightFactor ||
+        oldWidget.visibleBoxAnimation != widget.visibleBoxAnimation ||
+        oldWidget.invisibleBoxAnimation != widget.invisibleBoxAnimation) {
+      _configureAnimations();
+    }
+  }
+
+  void _configureAnimations() {
     setTextWidthAndHeight();
     controller = widget.controller;
 
@@ -104,7 +124,6 @@ class _AnimatedTextSlideBoxTransitionState
       ),
     );
 
-    // Animation for background opacity
     backgroundOpacityAnimation = Tween<double>(begin: 1.0, end: 0.0).animate(
       CurvedAnimation(
         parent: controller,
@@ -126,7 +145,19 @@ class _AnimatedTextSlideBoxTransitionState
 
   @override
   Widget build(BuildContext context) {
-    setTextWidthAndHeight();
+    final bool disableAnimations = MediaQuery.maybeOf(context)?.disableAnimations ?? false;
+
+    if (disableAnimations) {
+      return SizedBox(
+        width: textWidth,
+        child: Text(
+          widget.text,
+          style: widget.textStyle,
+          textAlign: widget.textAlign,
+          maxLines: widget.maxLines,
+        ),
+      );
+    }
 
     return SizedBox(
       height: textHeight,
@@ -154,6 +185,7 @@ class _AnimatedTextSlideBoxTransitionState
               widget.text,
               style: widget.textStyle,
               textAlign: widget.textAlign,
+              maxLines: widget.maxLines,
             ),
           ),
         ],

@@ -24,10 +24,6 @@ class ExperiencePage extends StatefulWidget {
 class _ExperiencePageState extends State<ExperiencePage>
     with TickerProviderStateMixin {
   late AnimationController _controller;
-  late AnimationController _experience1Controller;
-  late AnimationController _experience2Controller;
-  late AnimationController _experience3Controller;
-  late AnimationController _experience4Controller;
   late List<AnimationController> _experienceControllers;
 
   @override
@@ -36,38 +32,22 @@ class _ExperiencePageState extends State<ExperiencePage>
       duration: const Duration(milliseconds: 1200),
       vsync: this,
     );
-    _experience1Controller = AnimationController(
-      duration: const Duration(milliseconds: 1200),
-      vsync: this,
+    _experienceControllers = List.generate(
+      Data.experienceData.length,
+      (_) => AnimationController(
+        duration: const Duration(milliseconds: 1200),
+        vsync: this,
+      ),
     );
-    _experience2Controller = AnimationController(
-      duration: const Duration(milliseconds: 1200),
-      vsync: this,
-    );
-    _experience3Controller = AnimationController(
-      duration: const Duration(milliseconds: 1200),
-      vsync: this,
-    );
-    _experience4Controller = AnimationController(
-      duration: const Duration(milliseconds: 1200),
-      vsync: this,
-    );
-    _experienceControllers = [
-      _experience1Controller,
-      _experience2Controller,
-      _experience3Controller,
-      _experience4Controller,
-    ];
     super.initState();
   }
 
   @override
   void dispose() {
     _controller.dispose();
-    _experience1Controller.dispose();
-    _experience2Controller.dispose();
-    _experience3Controller.dispose();
-    _experience4Controller.dispose();
+    for (final controller in _experienceControllers) {
+      controller.dispose();
+    }
     super.dispose();
   }
 
@@ -155,7 +135,9 @@ class _ExperiencePageState extends State<ExperiencePage>
           key: Key('experience-section-$index'),
           onVisibilityChanged: (visibilityInfo) {
             double visiblePercentage = visibilityInfo.visibleFraction * 100;
-            if (visiblePercentage > 40) {
+            if (visiblePercentage > 40 &&
+                !_experienceControllers[index].isAnimating &&
+                !_experienceControllers[index].isCompleted) {
               _experienceControllers[index].forward();
             }
           },

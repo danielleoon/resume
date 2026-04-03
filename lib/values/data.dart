@@ -89,6 +89,21 @@ class SubMenuData {
 }
 
 class Data {
+  static List<ProjectItemData> get allProjects => projects;
+
+  static ProjectItemData? findProjectByRouteId(String routeId) {
+    for (final project in allProjects) {
+      if (project.routeId == routeId) {
+        return project;
+      }
+    }
+    return null;
+  }
+
+  static int indexOfProject(ProjectItemData project) {
+    return allProjects.indexWhere((item) => item.routeId == project.routeId);
+  }
+
   static List<NavItemData> menuItems = [
     NavItemData(name: StringConst.HOME, route: StringConst.HOME_PAGE),
     NavItemData(name: StringConst.ABOUT, route: StringConst.ABOUT_PAGE),
@@ -141,6 +156,9 @@ class Data {
   ];
 
   static List<String> otherTechnologies = [
+    "Angular",
+    "React",
+    "TypeScript",
     "Node JS",
     "PHP",
     "SQL",
@@ -218,6 +236,13 @@ class Data {
     //Projects.LOGIN_CATALOG,
     Projects.LEANCEAF,
     Projects.LEANCEPREV,
+    Projects.NOUMI,
+    Projects.LULUNET_VENTAS,
+    Projects.IENTC_ALMACEN,
+    Projects.LULUNET_CLIENTES,
+    Projects.IENTC_LANDING_PAGE,
+    Projects.LULUNET_LANDING_PAGE,
+    Projects.ARSE_POLIZAS_JURIDICAS,
     /* Projects.OTP_TEXT_FIELD,
     Projects.AERIUM,
     Projects.AERIUM_V2,
@@ -338,16 +363,16 @@ class Data {
 
   static List<ExperienceData> experienceData = [
     ExperienceData(
-      company: StringConst.COMPANY_5,
-      position: StringConst.POSITION_5,
-      companyUrl: StringConst.COMPANY_5_URL,
+      company: StringConst.COMPANY_6,
+      position: StringConst.POSITION_6,
+      companyUrl: StringConst.COMPANY_6_URL,
       roles: [
-        StringConst.COMPANY_5_ROLE_1,
-        StringConst.COMPANY_5_ROLE_2,
-        StringConst.COMPANY_5_ROLE_3,
+        StringConst.COMPANY_6_ROLE_1,
+        StringConst.COMPANY_6_ROLE_2,
+        StringConst.COMPANY_6_ROLE_3,
       ],
-      location: StringConst.LOCATION_5,
-      duration: StringConst.DURATION_5,
+      location: StringConst.LOCATION_6,
+      duration: StringConst.DURATION_6,
     ),
     ExperienceData(
       company: StringConst.COMPANY_4,
@@ -385,11 +410,172 @@ class Data {
       location: StringConst.LOCATION_2,
       duration: StringConst.DURATION_2,
     ),
+    ExperienceData(
+      company: StringConst.COMPANY_5,
+      position: StringConst.POSITION_5,
+      companyUrl: StringConst.COMPANY_5_URL,
+      roles: [
+        StringConst.COMPANY_5_ROLE_1,
+        StringConst.COMPANY_5_ROLE_2,
+        StringConst.COMPANY_5_ROLE_3,
+      ],
+      location: StringConst.LOCATION_5,
+      duration: StringConst.DURATION_5,
+    ),
   ];
 }
 
 class Projects {
+  static ProjectItemData NOUMI = ProjectItemData(
+    id: "noumi",
+    title: "Noumi",
+    subtitle: "Noumi",
+    platform: "Mobile App + Web Companion",
+    primaryColor: Color(0xFF585391),
+    image: ImagePath.NOUMI_1,
+    coverUrl: ImagePath.NOUMI_1,
+    navTitleColor: Color(0xFF585391),
+    navSelectedTitleColor: Color(0xFF585391),
+    appLogoColor: Color(0xFF585391),
+    projectAssets: [
+      ImagePath.NOUMI_2,
+    ],
+    category: "Bienestar emocional",
+    portfolioDescription:
+        "Aplicacion enfocada en gestion emocional diaria, journaling y tracking personal. La experiencia busca sentirse intima, segura y ligera, con espacios amplios, tipografia amigable y transiciones suaves sin saturacion visual.",
+    isPublic: false,
+    isOnPlayStore: true,
+    isLive: true,
+    webUrl: "https://www.noumi.mx/inicio",
+    playStoreUrl: "https://play.google.com/store/apps/details?id=mx.noumi.app",
+    appStoreUrl: "https://apps.apple.com/mx/app/noumi/id6744339024",
+    technologyUsed: "Flutter",
+  );
+
+  static ProjectItemData LULUNET_VENTAS = ProjectItemData(
+    id: "lulunet-ventas",
+    title: "Lulunet Ventas",
+    subtitle: "Lulunet Ventas",
+    platform: "Mobile App",
+    primaryColor: Color(0xFFD9FF00),
+    image: ImagePath.WORKS,
+    coverUrl: ImagePath.WORKS,
+    navTitleColor: Color(0xFF000000),
+    navSelectedTitleColor: Color(0xFFB8F000),
+    appLogoColor: Color(0xFF000000),
+    projectAssets: [ImagePath.WORKS],
+    category: "Sistema de ventas",
+    portfolioDescription:
+        "Herramienta para vendedores en campo enfocada en cerrar ventas rapido. La prioridad es velocidad operativa, alto contraste, botones grandes, flujo paso a paso y feedback inmediato para trabajar incluso bajo el sol.",
+    isPublic: false,
+    isOnPlayStore: false,
+    technologyUsed: StringConst.FLUTTER,
+  );
+
+  static ProjectItemData IENTC_ALMACEN = ProjectItemData(
+    id: "ientc-almacen",
+    title: "Ientc Almacen",
+    subtitle: "Ientc Almacen",
+    platform: "Mobile App",
+    primaryColor: Color(0xFFDC2626),
+    image: ImagePath.WORKS,
+    coverUrl: ImagePath.WORKS,
+    navTitleColor: Color(0xFF991B1B),
+    navSelectedTitleColor: Color(0xFFDC2626),
+    appLogoColor: Color(0xFFDC2626),
+    projectAssets: [ImagePath.WORKS],
+    category: "Control de almacen",
+    portfolioDescription:
+        "Sistema de inventario y operacion para procesos logisticos. La interfaz esta pensada para precision y rapidez, con inputs grandes, estados claros y una experiencia casi sin decoracion para reducir errores.",
+    isPublic: false,
+    isOnPlayStore: false,
+    technologyUsed: StringConst.FLUTTER,
+  );
+
+  static ProjectItemData LULUNET_CLIENTES = ProjectItemData(
+    id: "lulunet-clientes",
+    title: "Lulunet Clientes",
+    subtitle: "Lulunet Clientes",
+    platform: "Mobile App + Web",
+    primaryColor: Color(0xFFD9FF00),
+    image: ImagePath.WORKS,
+    coverUrl: ImagePath.WORKS,
+    navTitleColor: Color(0xFF000000),
+    navSelectedTitleColor: Color(0xFFB8F000),
+    appLogoColor: Color(0xFF000000),
+    projectAssets: [ImagePath.WORKS],
+    category: "Portal para clientes",
+    portfolioDescription:
+        "Portal para clientes residenciales de internet con una experiencia moderna, simple y accesible. La propuesta visual se apoya en una UI limpia con cards de consumo, pagos y plan, usando un lenguaje cercano y amigable.",
+    isPublic: false,
+    isOnPlayStore: false,
+    technologyUsed: StringConst.FLUTTER,
+  );
+
+  static ProjectItemData IENTC_LANDING_PAGE = ProjectItemData(
+    id: "landing-ientc",
+    title: "Landing Page Ientc",
+    subtitle: "Landing Page Ientc",
+    platform: "Web",
+    primaryColor: Color(0xFFDC2626),
+    image: ImagePath.WORKS,
+    coverUrl: ImagePath.WORKS,
+    navTitleColor: Color(0xFF000000),
+    navSelectedTitleColor: Color(0xFFDC2626),
+    appLogoColor: Color(0xFFDC2626),
+    projectAssets: [ImagePath.WORKS],
+    category: "Landing page",
+    portfolioDescription:
+        "Landing corporativa para una empresa de telecomunicaciones empresariales. El enfoque es transmitir confianza, capacidad operativa y soporte, con secciones claras, mensajes directos y una presencia visual B2B fuerte.",
+    isPublic: false,
+    isOnPlayStore: false,
+    technologyUsed: "Web",
+    isLive: false,
+  );
+
+  static ProjectItemData LULUNET_LANDING_PAGE = ProjectItemData(
+    id: "landing-lulunet",
+    title: "Landing Page Lulunet",
+    subtitle: "Landing Page Lulunet",
+    platform: "Web",
+    primaryColor: Color(0xFFD9FF00),
+    image: ImagePath.WORKS,
+    coverUrl: ImagePath.WORKS,
+    navTitleColor: Color(0xFF000000),
+    navSelectedTitleColor: Color(0xFFB8F000),
+    appLogoColor: Color(0xFF000000),
+    projectAssets: [ImagePath.WORKS],
+    category: "Landing page",
+    portfolioDescription:
+        "Landing enfocada en internet residencial con una comunicacion mas dinamica y directa. La prioridad es destacar velocidad, precio y facilidad de contratacion mediante beneficios claros y CTAs visibles.",
+    isPublic: false,
+    isOnPlayStore: false,
+    technologyUsed: "Web",
+    isLive: false,
+  );
+
+  static ProjectItemData ARSE_POLIZAS_JURIDICAS = ProjectItemData(
+    id: "arse-polizas-juridicas",
+    title: "Arse Polizas Juridicas",
+    subtitle: "Arse Polizas Juridicas",
+    platform: "Web App",
+    primaryColor: Color(0xFF0F172A),
+    image: ImagePath.WORKS,
+    coverUrl: ImagePath.WORKS,
+    navTitleColor: Color(0xFF0F172A),
+    navSelectedTitleColor: Color(0xFF0F172A),
+    appLogoColor: Color(0xFF0F172A),
+    projectAssets: [ImagePath.WORKS],
+    category: "SaaS legal documental",
+    portfolioDescription:
+        "Sistema documental y legal para contratos y polizas juridicas. La experiencia esta pensada para transmitir orden, seguridad y formalidad mediante tablas limpias, jerarquia clara y cero distracciones.",
+    isPublic: false,
+    isOnPlayStore: false,
+    technologyUsed: "Web",
+  );
+
   static ProjectItemData REFAC = ProjectItemData(
+    id: "refac",
     title: StringConst.REFAC,
     subtitle: StringConst.REFAC,
     platform: StringConst.REFAC_PLATFORM,
@@ -412,6 +598,7 @@ class Projects {
   );
 
   static ProjectItemData BOSCH_INV = ProjectItemData(
+    id: "bosch-inv",
     title: StringConst.BOSCH_INV,
     subtitle: StringConst.BOSCH_INV,
     platform: StringConst.BOSCH_INV_PLATFORM,
@@ -432,6 +619,7 @@ class Projects {
     technologyUsed: StringConst.FLUTTER,
   );
   static ProjectItemData BOSCH_SS = ProjectItemData(
+    id: "bosch-ss",
     title: StringConst.BOSCH_SS,
     subtitle: StringConst.BOSCH_SS,
     platform: StringConst.BOSCH_SS_PLATFORM,
@@ -454,6 +642,7 @@ class Projects {
     technologyUsed: StringConst.FLUTTER,
   );
   static ProjectItemData BOSCH_CERT = ProjectItemData(
+    id: "bosch-cert",
     title: StringConst.BOSCH_CERT,
     subtitle: StringConst.BOSCH_CERT,
     primaryColor: Color(0xFF01A053),
@@ -479,6 +668,7 @@ class Projects {
   );
 
   static ProjectItemData LOGIN_CATALOG = ProjectItemData(
+    id: "login-catalog",
     title: StringConst.LOGIN_CATALOG,
     primaryColor: AppColors.login_catalog,
     subtitle: StringConst.LOGIN_CATALOG,
@@ -502,6 +692,7 @@ class Projects {
     technologyUsed: StringConst.FLUTTER,
   );
   static ProjectItemData LEANCEAF = ProjectItemData(
+    id: "leanceaf",
     title: StringConst.LEANCEAF,
     subtitle: StringConst.LEANCEAF_SUBTITLE,
     category: StringConst.LEANCEAF_CATEGORY,
@@ -526,6 +717,7 @@ class Projects {
   );
 
   static ProjectItemData LEANCEPREV = ProjectItemData(
+    id: "leanceprev",
     title: StringConst.LEANCEPREV,
     subtitle: StringConst.LEANCEPREV,
     primaryColor: Color(0xFF273061),

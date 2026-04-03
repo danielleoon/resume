@@ -129,6 +129,58 @@ class NavBar extends StatelessWidget {
                       AppLogo(titleColor: appLogoColor),
                       const Spacer(),
                       ..._buildNavItems(context, languageProvider),
+                      Container(
+                        height: 44,
+                        padding: const EdgeInsets.symmetric(horizontal: 14),
+                        decoration: BoxDecoration(
+                          color: AppColors.white,
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton<String>(
+                            value: languageProvider.locale.languageCode,
+                            icon: Padding(
+                              padding: const EdgeInsets.only(left: 8),
+                              child: Icon(
+                                FeatherIcons.chevronDown,
+                                color: appLogoColor,
+                                size: 18,
+                              ),
+                            ),
+                            style: textTheme.bodyLarge?.copyWith(
+                              color: appLogoColor,
+                              fontSize: Sizes.TEXT_SIZE_14,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            dropdownColor: AppColors.white,
+                            borderRadius: BorderRadius.circular(10),
+                            onChanged: (value) {
+                              if (value == null) {
+                                return;
+                              }
+
+                              languageProvider.setLanguage(value);
+                              final currentRoute =
+                                  ModalRoute.of(context)?.settings.name ?? '/';
+                              Navigator.pushReplacementNamed(
+                                context,
+                                currentRoute,
+                              );
+                            },
+                            items: const [
+                              DropdownMenuItem(
+                                value: 'es',
+                                child: Text('Español'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'en',
+                                child: Text('English'),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 16),
                       AeriumButton(
                         height: Sizes.HEIGHT_36,
                         hasIcon: false,
@@ -143,30 +195,6 @@ class NavBar extends StatelessWidget {
                             "Resume_Jose_Daniel_Leon_Sanchez_2025.pdf",
                           );
                         },
-                      ),
-                      const SizedBox(width: 16),
-                      Row(
-                        children: [
-                          Text(
-                            languageProvider.locale.languageCode == 'es'
-                                ? 'ES'
-                                : 'EN',
-                            style: TextStyle(
-                              color: appLogoColor,
-                              fontSize: Sizes.TEXT_SIZE_16,
-                            ),
-                          ),
-                          Switch(
-                            value: languageProvider.locale.languageCode == 'es',
-                            onChanged: (_) {
-                              languageProvider.toggleLanguage();
-                              final currentRoute =
-                                  ModalRoute.of(context)?.settings.name ?? '/';
-                              Navigator.pushReplacementNamed(
-                                  context, currentRoute);
-                            },
-                          ),
-                        ],
                       ),
                     ],
                   ),

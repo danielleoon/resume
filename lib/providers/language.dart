@@ -6,10 +6,17 @@ class LanguageProvider extends ChangeNotifier {
 
   Locale get locale => _locale;
 
+  void setLanguage(String languageCode) {
+    if (_locale.languageCode == languageCode) {
+      return;
+    }
+
+    _locale = Locale(languageCode);
+    StringConst.setLocale(_locale);
+    notifyListeners();
+  }
+
   void toggleLanguage() {
-    _locale =
-        _locale.languageCode == 'es' ? const Locale('en') : const Locale('es');
-    StringConst.setLocale(_locale); // Cambia el idioma en StringConst
-    notifyListeners(); // Notifica a los widgets para que se redibujen
+    setLanguage(_locale.languageCode == 'es' ? 'en' : 'es');
   }
 }

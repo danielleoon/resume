@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 
 class ProjectItemData {
   ProjectItemData({
+    this.id = "",
     required this.title,
     required this.image,
     required this.coverUrl,
@@ -25,12 +26,14 @@ class ProjectItemData {
     this.gitHubUrl = "",
     this.hasBeenReleased = true,
     this.playStoreUrl = "",
+    this.appStoreUrl = "",
     this.webUrl = "",
     this.navTitleColor = AppColors.grey600,
     this.navSelectedTitleColor = AppColors.letterColor,
     this.appLogoColor = AppColors.letterColor,
   });
 
+  final String id;
   final Color primaryColor;
   final Color navTitleColor;
   final Color navSelectedTitleColor;
@@ -50,9 +53,23 @@ class ProjectItemData {
   final String gitHubUrl;
   final bool isOnPlayStore;
   final String playStoreUrl;
+  final String appStoreUrl;
   final bool isLive;
   final String webUrl;
   final String? technologyUsed;
+
+  String get routeId => id.isNotEmpty ? id : _slugify(title);
+
+  static String _slugify(String value) {
+    final normalized = value
+        .toLowerCase()
+        .trim()
+        .replaceAll(RegExp(r'[^\w\s-]'), '')
+        .replaceAll(RegExp(r'\s+'), '-')
+        .replaceAll('_', '-')
+        .replaceAll(RegExp(r'-+'), '-');
+    return normalized;
+  }
 }
 
 class ProjectData extends StatelessWidget {
@@ -225,7 +242,7 @@ class _ProjectItemLgState extends State<ProjectItemLg>
     with SingleTickerProviderStateMixin {
   bool _isHovering = false;
   late AnimationController _controller;
-  // late Animation<double> _animation;
+  late Animation<double> _imageSlideAnimation;
 
   @override
   void initState() {
@@ -233,8 +250,37 @@ class _ProjectItemLgState extends State<ProjectItemLg>
       vsync: this,
       duration: widget.duration,
     );
+    _imageSlideAnimation = const AlwaysStoppedAnimation<double>(0);
 
     super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final double projectItemWidth = widthOfScreen(context);
+    final double imageWidth = responsiveSize(
+      context,
+      projectItemWidth / 2.5,
+      projectItemWidth / 4,
+      md: projectItemWidth / 3,
+      sm: projectItemWidth / 2.8,
+    );
+    _imageSlideAnimation = Tween<double>(
+      begin: responsiveSize(
+        context,
+        -imageWidth * 2.2,
+        -imageWidth * 1.8,
+        md: -imageWidth * 2.2,
+      ),
+      end: 0.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.fastOutSlowIn));
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   void _mouseEnter(bool hovering) {
@@ -288,18 +334,6 @@ class _ProjectItemLgState extends State<ProjectItemLg>
       md: projectItemWidth / 3,
       sm: projectItemWidth / 2.8,
     );
-    Animation<double> animation = Tween<double>(
-      begin: responsiveSize(
-        context,
-        -imageWidth * 2.2,
-        -imageWidth * 1.8,
-        md: -imageWidth * 2.2,
-      ),
-      end: 0.0,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.fastOutSlowIn))
-      ..addListener(() {
-        setState(() {});
-      });
     double buttonWidth = responsiveSize(
       context,
       startWidthOfButtonMd,
@@ -407,16 +441,20 @@ class _ProjectItemLgState extends State<ProjectItemLg>
             ),
             Positioned(
               right: 0,
-              child: Transform(
-                origin: Offset(animation.value, 0),
-                transform: Matrix4.identity()
-                  ..setEntry(3, 2, 0.0095)
-                  ..rotateY(0.075),
+              child: AnimatedBuilder(
+                animation: _imageSlideAnimation,
                 child: Image.asset(
                   widget.imageUrl,
                   width: imageWidth,
                   height: containerHeight,
                   fit: BoxFit.cover,
+                ),
+                builder: (context, child) => Transform(
+                  origin: Offset(_imageSlideAnimation.value, 0),
+                  transform: Matrix4.identity()
+                    ..setEntry(3, 2, 0.0095)
+                    ..rotateY(0.075),
+                  child: child,
                 ),
               ),
             ),
@@ -515,6 +553,12 @@ class _ProjectItemSmState extends State<ProjectItemSm>
         _controller.reverse();
       });
     }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override

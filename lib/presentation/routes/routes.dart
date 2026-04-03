@@ -54,7 +54,7 @@ class RouteConfiguration {
       (context, matches) => const WorksPage(),
     ),
     Path(
-      r'^' + ProjectDetailPage.projectDetailPageRoute,
+      r'^' + ProjectDetailPage.projectDetailPageRoute + r'(?:/([\w-]+))?$',
       (context, matches) => const ProjectDetailPage(),
     ),
     Path(

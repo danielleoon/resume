@@ -51,6 +51,10 @@ class ImagePath {
 
   // Projects
 
+  // NOUMI
+  static const String NOUMI_1 = "$projectsDir/noumi/noumi_1.png";
+  static const String NOUMI_2 = "$projectsDir/noumi/noumi_2.png";
+
   // LEANCEPREV
   static const String LEANCEPREV_COVER =
       "$projectsDir/LEANCEPREV/LEANCEPREV_COVER.png";

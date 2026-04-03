@@ -46,7 +46,7 @@ class _ProjectDetailPageState extends State<ProjectDetailPage>
   late AnimationController _waveController;
   late AnimationController _aboutProjectController;
   late AnimationController _projectDataController;
-  late ProjectDetailArguments projectDetails;
+  ProjectDetailArguments? projectDetails;
   double waveLineHeight = 100;
 
   @override
@@ -86,29 +86,87 @@ class _ProjectDetailPageState extends State<ProjectDetailPage>
     super.dispose();
   }
 
-  ProjectDetailArguments getArguments() {
-    projectDetails =
-        ModalRoute.of(context)!.settings.arguments as ProjectDetailArguments;
+  ProjectDetailArguments? getArguments() {
+    final route = ModalRoute.of(context);
+    final args = route?.settings.arguments;
+    if (args is ProjectDetailArguments) {
+      projectDetails = args;
+      return projectDetails;
+    }
+
+    final routeName = route?.settings.name ?? "";
+    final uri = Uri.tryParse(routeName);
+    final segments = uri?.pathSegments ?? const <String>[];
+
+    if (segments.length >= 2) {
+      final routeId = segments[1];
+      final project = Data.findProjectByRouteId(routeId);
+      if (project != null) {
+        final dataSource = Data.allProjects;
+        final currentIndex = Data.indexOfProject(project);
+        final hasNextProject =
+            currentIndex >= 0 && currentIndex < dataSource.length - 1;
+        final nextProject =
+            hasNextProject ? dataSource[currentIndex + 1] : null;
+
+        projectDetails = ProjectDetailArguments(
+          dataSource: dataSource,
+          data: project,
+          currentIndex: currentIndex,
+          hasNextProject: hasNextProject,
+          nextProject: nextProject,
+        );
+      }
+    }
+
     return projectDetails;
   }
 
   @override
   Widget build(BuildContext context) {
     getArguments();
+    final details = projectDetails;
+    if (details == null) {
+      return PageWrapper(
+        backgroundColor: AppColors.white,
+        selectedRoute: ProjectDetailPage.projectDetailPageRoute,
+        hasSideTitle: false,
+        selectedPageName: StringConst.PROJECT,
+        navBarAnimationController: _controller,
+        onLoadingAnimationDone: () {
+          _controller.forward();
+        },
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Text(
+              "Proyecto no encontrado.",
+              style: Theme.of(context).textTheme.headlineMedium,
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+      );
+    }
     TextTheme textTheme = Theme.of(context).textTheme;
     TextStyle? coverTitleStyle = textTheme.displayMedium?.copyWith(
       color: Colors.white,
       fontSize: 50,
       shadows: [
         Shadow(
-          offset: Offset(0, -4.0), // Dirección de la sombra blanca hacia arriba
-          blurRadius: 10.0, // Ajusta la intensidad del desenfoque
-          color: Colors.black.withOpacity(0.3), // Color de la sombra blanca
+          offset: const Offset(0, 3),
+          blurRadius: 14,
+          color: Colors.black.withOpacity(0.55),
         ),
         Shadow(
-          offset: Offset(0, 4.0), // Dirección de la sombra negra hacia abajo
-          blurRadius: 10.0, // Ajusta la intensidad del desenfoque
-          color: Colors.black.withOpacity(0.7), // Color de la sombra negra
+          offset: const Offset(0, 10),
+          blurRadius: 28,
+          color: Colors.black.withOpacity(0.35),
+        ),
+        Shadow(
+          offset: const Offset(0, 0),
+          blurRadius: 6,
+          color: Colors.black.withOpacity(0.20),
         ),
       ],
     );
@@ -116,14 +174,19 @@ class _ProjectDetailPageState extends State<ProjectDetailPage>
       color: Colors.white,
       shadows: [
         Shadow(
-          offset: Offset(0, -4.0), // Dirección de la sombra blanca hacia arriba
-          blurRadius: 10.0, // Ajusta la intensidad del desenfoque
-          color: Colors.black.withOpacity(0.3), // Color de la sombra blanca
+          offset: const Offset(0, 4),
+          blurRadius: 18,
+          color: Colors.black.withOpacity(0.90),
         ),
         Shadow(
-          offset: Offset(0, 4.0), // Dirección de la sombra negra hacia abajo
-          blurRadius: 10.0, // Ajusta la intensidad del desenfoque
-          color: Colors.black.withOpacity(0.7), // Color de la sombra negra
+          offset: const Offset(0, 12),
+          blurRadius: 30,
+          color: Colors.black.withOpacity(0.70),
+        ),
+        Shadow(
+          offset: const Offset(0, 0),
+          blurRadius: 8,
+          color: Colors.black.withOpacity(0.45),
         ),
       ],
     );
@@ -150,9 +213,9 @@ class _ProjectDetailPageState extends State<ProjectDetailPage>
       hasSideTitle: false,
       selectedPageName: StringConst.PROJECT,
       navBarAnimationController: _controller,
-      navBarTitleColor: projectDetails.data.navTitleColor,
-      navBarSelectedTitleColor: projectDetails.data.navSelectedTitleColor,
-      appLogoColor: projectDetails.data.appLogoColor,
+      navBarTitleColor: details.data.navTitleColor,
+      navBarSelectedTitleColor: details.data.navSelectedTitleColor,
+      appLogoColor: details.data.appLogoColor,
       onLoadingAnimationDone: () {
         _controller.forward();
       },
@@ -168,36 +231,66 @@ class _ProjectDetailPageState extends State<ProjectDetailPage>
             child: Stack(
               children: [
                 Image.asset(
-                  projectDetails.data.coverUrl,
+                  details.data.coverUrl,
                   fit: BoxFit.cover,
                   width: widthOfScreen(context),
                   height: heightOfScreen(context),
                 ),
                 Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.black.withOpacity(0.05),
+                        Colors.black.withOpacity(0.10),
+                        Colors.black.withOpacity(0.55),
+                      ],
+                    ),
+                  ),
+                ),
+                Container(
                   margin: EdgeInsets.only(bottom: waveLineHeight + 40),
                   child: Align(
                     alignment: Alignment.bottomCenter,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        AnimatedTextSlideBoxTransition(
-                          controller: _controller,
-                          widthFactor: 1.20,
-                          text: "${projectDetails.data.title}.",
-                          coverColor: projectDetails.data.primaryColor,
-                          textStyle: coverTitleStyle,
-                          textAlign: TextAlign.center,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 32,
+                        vertical: 24,
+                      ),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.black.withOpacity(0.18),
+                            Colors.black.withOpacity(0.48),
+                          ],
                         ),
-                        SpaceH20(),
-                        AnimatedTextSlideBoxTransition(
-                          controller: _controller,
-                          widthFactor: 1.20,
-                          text: projectDetails.data.category,
-                          coverColor: projectDetails.data.primaryColor,
-                          textStyle: coverSubtitleStyle,
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
+                        borderRadius: BorderRadius.circular(24),
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          AnimatedTextSlideBoxTransition(
+                            controller: _controller,
+                            widthFactor: 1.20,
+                            text: "${details.data.title}.",
+                            coverColor: details.data.primaryColor,
+                            textStyle: coverTitleStyle,
+                            textAlign: TextAlign.center,
+                          ),
+                          SpaceH20(),
+                          AnimatedTextSlideBoxTransition(
+                            controller: _controller,
+                            widthFactor: 1.20,
+                            text: details.data.category,
+                            coverColor: details.data.primaryColor,
+                            textStyle: coverSubtitleStyle,
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -207,7 +300,7 @@ class _ProjectDetailPageState extends State<ProjectDetailPage>
                     child: AnimatedWaveLine(
                       height: waveLineHeight,
                       controller: _waveController,
-                      color: projectDetails.data.primaryColor,
+                      color: details.data.primaryColor,
                     ),
                   ),
                 )
@@ -219,7 +312,9 @@ class _ProjectDetailPageState extends State<ProjectDetailPage>
             key: const Key('about-project'),
             onVisibilityChanged: (visibilityInfo) {
               double visiblePercentage = visibilityInfo.visibleFraction * 100;
-              if (visiblePercentage > 40) {
+              if (visiblePercentage > 15 &&
+                  !_aboutProjectController.isAnimating &&
+                  !_aboutProjectController.isCompleted) {
                 _aboutProjectController.forward();
               }
             },
@@ -228,7 +323,7 @@ class _ProjectDetailPageState extends State<ProjectDetailPage>
               child: ContentArea(
                 width: contentAreaWidth,
                 child: Aboutproject(
-                  projectData: projectDetails.data,
+                  projectData: details.data,
                   controller: _aboutProjectController,
                   projectDataController: _projectDataController,
                   width: contentAreaWidth,
@@ -237,31 +332,31 @@ class _ProjectDetailPageState extends State<ProjectDetailPage>
             ),
           ),
           CustomSpacer(heightFactor: 0.15),
-          ..._buildProjectAlbum(projectDetails.data.projectAssets),
-          projectDetails.hasNextProject
+          ..._buildProjectAlbum(details.data.projectAssets),
+          details.hasNextProject
               ? CustomSpacer(heightFactor: 0.15)
               : Empty(),
-          projectDetails.hasNextProject
+          details.hasNextProject
               ? Padding(
                   padding: padding,
                   child: ContentArea(
                     width: contentAreaWidth,
                     child: NextProject(
                       width: contentAreaWidth,
-                      nextProject: projectDetails.nextProject!,
+                      nextProject: details.nextProject!,
                       navigateToNextProject: () {
                         Functions.navigateToProject(
                           context: context,
-                          dataSource: projectDetails.dataSource,
-                          currentProject: projectDetails.nextProject!,
-                          currentProjectIndex: projectDetails.currentIndex + 1,
+                          dataSource: details.dataSource,
+                          currentProject: details.nextProject!,
+                          currentProjectIndex: details.currentIndex + 1,
                         );
                       },
                     ),
                   ),
                 )
               : Empty(),
-          projectDetails.hasNextProject
+          details.hasNextProject
               ? CustomSpacer(heightFactor: 0.15)
               : Empty(),
           SimpleFooter(),

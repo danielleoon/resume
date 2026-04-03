@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:cv_daniel/infrastructure/failures/email_failure.dart';
 import 'package:cv_daniel/values/strings.dart';
 import 'package:http/http.dart' as http;
-import 'package:cv_daniel/values/values.dart';
 
 import 'email_model.dart';
 

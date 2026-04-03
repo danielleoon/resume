@@ -51,9 +51,15 @@ class _AboutprojectState extends State<Aboutproject> {
 
   @override
   Widget build(BuildContext context) {
-    double googlePlayButtonWidth = 150;
+    final bool hasWebLink = widget.projectData.webUrl.trim().isNotEmpty;
+    final bool hasSourceLink = widget.projectData.gitHubUrl.trim().isNotEmpty;
+    final bool hasStoreLink = widget.projectData.playStoreUrl.trim().isNotEmpty;
+    final bool hasAppStoreLink =
+        widget.projectData.appStoreUrl.trim().isNotEmpty;
     double targetWidth = responsiveSize(context, 118, 150, md: 150);
     double initialWidth = responsiveSize(context, 36, 50, md: 50);
+    double storeButtonWidth = responsiveSize(context, 190, 225, md: 210);
+    double storeButtonHeight = 64;
     TextTheme textTheme = Theme.of(context).textTheme;
     TextStyle? bodyTextStyle = textTheme.bodyLarge?.copyWith(
       fontSize: Sizes.TEXT_SIZE_18,
@@ -151,9 +157,11 @@ class _AboutprojectState extends State<Aboutproject> {
                 )
               : Empty(),
           SpaceH30(),
-          Row(
+          Wrap(
+            spacing: 20,
+            runSpacing: 20,
             children: [
-              widget.projectData.isLive
+              hasWebLink
                   ? AnimatedPositionedWidget(
                       controller: CurvedAnimation(
                         parent: widget.projectDataController,
@@ -162,7 +170,7 @@ class _AboutprojectState extends State<Aboutproject> {
                       width: targetWidth,
                       height: initialWidth,
                       child: AnimatedBubbleButton(
-                        title: StringConst.LAUNCH_APP,
+                        title: "Ir a sitio web",
                         color: AppColors.grey100,
                         imageColor: AppColors.black,
                         startBorderRadius: borderRadius,
@@ -178,8 +186,7 @@ class _AboutprojectState extends State<Aboutproject> {
                       ),
                     )
                   : Empty(),
-              widget.projectData.isLive ? const Spacer() : Empty(),
-              widget.projectData.isPublic
+              hasSourceLink
                   ? AnimatedPositionedWidget(
                       controller: CurvedAnimation(
                         parent: widget.projectDataController,
@@ -204,33 +211,132 @@ class _AboutprojectState extends State<Aboutproject> {
                       ),
                     )
                   : Empty(),
-              widget.projectData.isPublic ? const Spacer() : Empty(),
             ],
           ),
-          widget.projectData.isPublic || widget.projectData.isLive
+          hasWebLink || hasSourceLink || hasStoreLink || hasAppStoreLink
               ? SpaceH30()
               : Empty(),
-          widget.projectData.isOnPlayStore
-              ? InkWell(
-                  onTap: () {
-                    Functions.launchUrl(widget.projectData.playStoreUrl);
-                  },
-                  child: AnimatedPositionedWidget(
-                    controller: CurvedAnimation(
-                      parent: widget.projectDataController,
-                      curve: Animations.textSlideInCurve,
-                    ),
-                    width: googlePlayButtonWidth,
-                    height: 50,
-                    child: Image.asset(
-                      ImagePath.GOOGLE_PLAY,
-                      width: googlePlayButtonWidth,
-                      // fit: BoxFit.fitHeight,
-                    ),
-                  ),
-                )
-              : Empty(),
+          Wrap(
+            spacing: 20,
+            runSpacing: 20,
+            children: [
+              hasStoreLink
+                  ? AnimatedPositionedWidget(
+                      controller: CurvedAnimation(
+                        parent: widget.projectDataController,
+                        curve: Animations.textSlideInCurve,
+                      ),
+                      width: storeButtonWidth,
+                      height: storeButtonHeight,
+                      child: _StoreBadgeButton(
+                        title: "Google Play",
+                        subtitle: "GET IT ON",
+                        icon: Icons.android_rounded,
+                        onTap: () {
+                          Functions.launchUrl(widget.projectData.playStoreUrl);
+                        },
+                      ),
+                    )
+                  : Empty(),
+              hasAppStoreLink
+                  ? AnimatedPositionedWidget(
+                      controller: CurvedAnimation(
+                        parent: widget.projectDataController,
+                        curve: Animations.textSlideInCurve,
+                      ),
+                      width: storeButtonWidth,
+                      height: storeButtonHeight,
+                      child: _StoreBadgeButton(
+                        title: "App Store",
+                        subtitle: "Download on the",
+                        icon: Icons.phone_iphone_rounded,
+                        onTap: () {
+                          Functions.launchUrl(widget.projectData.appStoreUrl);
+                        },
+                      ),
+                    )
+                  : Empty(),
+            ],
+          ),
         ],
+      ),
+    );
+  }
+}
+
+class _StoreBadgeButton extends StatelessWidget {
+  const _StoreBadgeButton({
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+    required this.onTap,
+  });
+
+  final String title;
+  final String subtitle;
+  final IconData icon;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final TextTheme textTheme = Theme.of(context).textTheme;
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(24),
+        child: Ink(
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: AppColors.grey300),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
+                size: 26,
+                color: AppColors.black,
+              ),
+              SpaceW12(),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      subtitle,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: textTheme.bodyLarge?.copyWith(
+                        color: AppColors.black,
+                        fontSize: 10,
+                        height: 1.0,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: textTheme.headlineMedium?.copyWith(
+                        color: AppColors.black,
+                        fontSize: responsiveSize(context, 18, 21, md: 20),
+                        height: 1.0,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

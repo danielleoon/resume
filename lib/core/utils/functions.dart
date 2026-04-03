@@ -21,11 +21,7 @@ class Functions {
     final url = html.Url.createObjectUrlFromBlob(blob);
 
     // Crear un elemento <a> para iniciar la descarga
-    final anchor = html.AnchorElement(href: url)
-      ..setAttribute(
-          "download", downloadFileName) // Nombre del archivo en la descarga
-      ..style.display = "none" // Ocultar el elemento en la interfaz
-      ..click(); // Simular el clic para iniciar la descarga
+// Simular el clic para iniciar la descarga
 
     // Liberar la URL creada
     html.Url.revokeObjectUrl(url);
@@ -60,7 +56,7 @@ class Functions {
       nextProject = dataSource[currentProjectIndex + 1];
     }
     Navigator.of(context).pushNamed(
-      ProjectDetailPage.projectDetailPageRoute,
+      "${ProjectDetailPage.projectDetailPageRoute}/${currentProject.routeId}",
       arguments: ProjectDetailArguments(
         dataSource: dataSource,
         currentIndex: currentProjectIndex,

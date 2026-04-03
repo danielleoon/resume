@@ -25,7 +25,7 @@ class _NoteWorthyProjectsState extends State<NoteWorthyProjects>
   void initState() {
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1500),
+      duration: Animations.slideAnimationDurationLong,
     );
     super.initState();
   }
@@ -63,7 +63,9 @@ class _NoteWorthyProjectsState extends State<NoteWorthyProjects>
       key: const Key('noteworthy-projects'),
       onVisibilityChanged: (visibilityInfo) {
         double visiblePercentage = visibilityInfo.visibleFraction * 100;
-        if (visiblePercentage > 25) {
+        if (visiblePercentage > 10 &&
+            !_controller.isAnimating &&
+            !_controller.isCompleted) {
           _controller.forward();
         }
       },

@@ -31,12 +31,8 @@ class HomePageHeader extends StatefulWidget {
 }
 
 class _HomePageHeaderState extends State<HomePageHeader>
-    with TickerProviderStateMixin {
-  late AnimationController controller;
-  late AnimationController rotationController;
+    with SingleTickerProviderStateMixin {
   late AnimationController scrollDownButtonController;
-  late Animation<Offset> animation;
-  late Animation<Offset> scrollDownBtnAnimation;
 
   @override
   void initState() {
@@ -44,197 +40,135 @@ class _HomePageHeaderState extends State<HomePageHeader>
       vsync: this,
       duration: const Duration(milliseconds: 300),
     );
-    rotationController = AnimationController(
-      duration: const Duration(seconds: 20),
-      vsync: this,
-    )..repeat();
-    controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1500),
-    )..repeat();
-    animation = Tween<Offset>(
-      begin: const Offset(0, 0.05),
-      end: const Offset(0, -0.05),
-    ).animate(
-      CurvedAnimation(
-        parent: controller,
-        curve: Curves.easeInOut,
-      ),
-    );
-    controller.addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        controller.reverse();
-      } else if (status == AnimationStatus.dismissed) {
-        controller.forward();
-      }
-    });
-    rotationController.addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        rotationController.reset();
-        rotationController.forward();
-        // rotationController.reverse();
-      }
-    });
-    controller.forward();
-    rotationController.forward();
     super.initState();
   }
 
   @override
   void dispose() {
-    controller.dispose();
     scrollDownButtonController.dispose();
-    rotationController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final double screenWidth = widthOfScreen(context);
-    final double screenHeight = heightOfScreen(context);
-    final EdgeInsets textMargin = EdgeInsets.only(
-      left: responsiveSize(
+    final bool isCompactLayout =
+        screenWidth < RefinedBreakpoints().tabletNormal;
+    final double topInset = MediaQuery.paddingOf(context).top;
+    final EdgeInsets heroPadding = EdgeInsets.fromLTRB(
+      responsiveSize(
         context,
         20,
-        screenWidth * 0.15,
-        sm: screenWidth * 0.15,
+        screenWidth * 0.10,
+        sm: screenWidth * 0.08,
       ),
-      top: responsiveSize(
+      (isCompactLayout
+              ? responsiveSize(
+                  context,
+                  96,
+                  112,
+                  sm: 96,
+                )
+              : responsiveSize(
+                  context,
+                  56,
+                  120,
+                  md: 96,
+                  sm: 56,
+                )) +
+          topInset,
+      responsiveSize(
         context,
-        60,
-        screenHeight * 0.25,
-        sm: screenHeight * 0.25,
+        20,
+        screenWidth * 0.08,
+        sm: screenWidth * 0.08,
       ),
-      bottom: responsiveSize(context, 20, 40),
+      responsiveSize(
+        context,
+        36,
+        88,
+        md: 72,
+        sm: 40,
+      ),
     );
-    final EdgeInsets padding = EdgeInsets.symmetric(
-      horizontal: screenWidth * 0.1,
-      vertical: screenHeight * 0.1,
+    final EdgeInsets mobileImagePadding = EdgeInsets.symmetric(
+      horizontal: responsiveSize(context, 0, screenWidth * 0.02, sm: 0),
+      vertical: responsiveSize(context, 16, 24, sm: 16),
     );
-    final EdgeInsets imageMargin = EdgeInsets.only(
-      right: responsiveSize(
-        context,
-        0,
-        screenWidth * 0.0,
-        sm: screenWidth * 0.0,
-      ),
-      top: responsiveSize(
-        context,
-        30,
-        screenHeight * 0.20,
-        sm: screenHeight * 0.25,
-      ),
-      bottom: responsiveSize(context, 20, 40),
+    final double desktopMinHeight = responsiveSize(
+      context,
+      0,
+      640,
+      md: 600,
     );
 
     return Container(
-      //height: heightOfScreen(context) * 1.28,
-      height: 1400,
+      constraints: BoxConstraints(
+        minHeight: isCompactLayout ? 0 : desktopMinHeight,
+      ),
       width: screenWidth,
       color: AppColors.accentColor2.withOpacity(0.35),
       child: Stack(
         children: [
-          Container(
-            margin: EdgeInsets.only(
-              top: assignHeight(context, 0.1),
-            ),
-            child: const Align(
-              alignment: Alignment.topCenter,
-              child: DiagonalLines(),
+          const Positioned.fill(
+            child: IgnorePointer(
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: DiagonalLines(),
+              ),
             ),
           ),
-          ResponsiveBuilder(builder: (context, sizingInformation) {
-            double screenWidth = sizingInformation.screenSize.width;
-            if (screenWidth < RefinedBreakpoints().tabletNormal) {
-              return SingleChildScrollView(
-                  child: Column(
-                children: [
-                  const SizedBox(
-                    height: 30,
-                  ),
-                  Container(
-                    padding: padding,
-                    child: Stack(
-                      children: [
-                        Image.asset(
-                          ImagePath.IMAGE1,
-                          width: screenWidth,
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    padding: padding.copyWith(top: 0),
-                    child: SizedBox(
+          Padding(
+            padding: heroPadding,
+            child: ResponsiveBuilder(builder: (context, sizingInformation) {
+              double screenWidth = sizingInformation.screenSize.width;
+              if (screenWidth < RefinedBreakpoints().tabletNormal) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
                       width: screenWidth,
                       child: AboutDev(
                         controller: widget.controller,
                         width: screenWidth,
                       ),
                     ),
-                  ),
-                ],
-              ));
-            } else {
-              return Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    margin: textMargin,
-                    child: SizedBox(
-                      width: screenWidth * 0.40,
+                    SpaceH30(),
+                    Padding(
+                      padding: mobileImagePadding,
+                      child: Image.asset(
+                        ImagePath.IMAGE1,
+                        width: screenWidth,
+                      ),
+                    ),
+                  ],
+                );
+              } else {
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      width: screenWidth * 0.42,
                       child: AboutDev(
                         controller: widget.controller,
-                        width: screenWidth * 0.40,
+                        width: screenWidth * 0.42,
                       ),
                     ),
-                  ),
-                  SizedBox(width: screenWidth * 0.05),
-                  /*Container(
-                    margin: imageMargin,
-                    child: AnimatedSlideTranstion(
-                      controller: controller,
-                      position: animation,
-                      child: Stack(
-                        children: [
-                          /*RotationTransition(
-                            turns: rotationController,
-                            child: Image.asset(
-                              ImagePath.DEV_SKILLS_2,
-                              width: screenWidth * 0.35,
-                            ),
-                          ),*/
-                          Image.asset(
-                            ImagePath.IMAGE1,
-                            width: screenWidth * 0.35,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-*/
-                  Container(
-                    margin: imageMargin,
-                    child: Stack(
-                      children: [
-                        /*RotationTransition(
-                            turns: rotationController,
-                            child: Image.asset(
-                              ImagePath.DEV_SKILLS_2,
-                              width: screenWidth * 0.35,
-                            ),
-                          ),*/
-                        Image.asset(
+                    SizedBox(width: screenWidth * 0.04),
+                    Expanded(
+                      child: Align(
+                        alignment: Alignment.centerRight,
+                        child: Image.asset(
                           ImagePath.IMAGE1,
-                          width: screenWidth * 0.35,
+                          width: screenWidth * 0.33,
                         ),
-                      ],
+                      ),
                     ),
-                  ),
-                ],
-              );
-            }
-          }),
+                  ],
+                );
+              }
+            }),
+          ),
           Positioned(
             right: 0,
             bottom: 0,
@@ -435,29 +369,47 @@ class _AboutDevState extends State<AboutDev> {
                   mainAxisAlignment: rowAlignment,
                   children: [
                     Flexible(
-                      child: Padding(
-                        padding: const EdgeInsets.all(12),
-                        child: Image.asset(
-                          ImagePath.BOSCH_LOGO,
-                          width: containerWidth / 3,
+                      child: _AnimatedCompanyLogo(
+                        controller: widget.controller,
+                        width: containerWidth / 3,
+                        delayStart: 0.50,
+                        delayEnd: 0.80,
+                        child: Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: Image.asset(
+                            ImagePath.BOSCH_LOGO,
+                            width: containerWidth / 3,
+                          ),
                         ),
                       ),
                     ),
                     Flexible(
-                      child: Padding(
-                        padding: const EdgeInsets.all(10),
-                        child: Image.asset(
-                          ImagePath.SIEMENS_LOGO,
-                          width: containerWidth / 3,
+                      child: _AnimatedCompanyLogo(
+                        controller: widget.controller,
+                        width: containerWidth / 3,
+                        delayStart: 0.58,
+                        delayEnd: 0.88,
+                        child: Padding(
+                          padding: const EdgeInsets.all(10),
+                          child: Image.asset(
+                            ImagePath.SIEMENS_LOGO,
+                            width: containerWidth / 3,
+                          ),
                         ),
                       ),
                     ),
                     Flexible(
-                      child: Padding(
-                        padding: const EdgeInsets.all(12),
-                        child: Image.asset(
-                          ImagePath.LEANCE_LOGO,
-                          width: containerWidth / 3,
+                      child: _AnimatedCompanyLogo(
+                        controller: widget.controller,
+                        width: containerWidth / 3,
+                        delayStart: 0.66,
+                        delayEnd: 0.96,
+                        child: Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: Image.asset(
+                            ImagePath.LEANCE_LOGO,
+                            width: containerWidth / 3,
+                          ),
                         ),
                       ),
                     ),
@@ -570,5 +522,39 @@ class _AboutDevState extends State<AboutDev> {
     }
 
     return items;
+  }
+}
+
+class _AnimatedCompanyLogo extends StatelessWidget {
+  const _AnimatedCompanyLogo({
+    required this.controller,
+    required this.width,
+    required this.delayStart,
+    required this.delayEnd,
+    required this.child,
+  });
+
+  final AnimationController controller;
+  final double width;
+  final double delayStart;
+  final double delayEnd;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final CurvedAnimation animation = CurvedAnimation(
+      parent: controller,
+      curve: Interval(delayStart, delayEnd, curve: Curves.fastOutSlowIn),
+    );
+
+    return AnimatedPositionedWidget(
+      controller: animation,
+      width: width,
+      height: 70,
+      child: FadeTransition(
+        opacity: animation,
+        child: child,
+      ),
+    );
   }
 }

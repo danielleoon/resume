@@ -16,7 +16,7 @@ class StringConst {
 
   // Strings
   static String get APP_NAME =>
-      _localizedValue(en: "Daniel Leon Page", es: "Página Daniel Leon");
+      _localizedValue(en: "Daniel Leon Portfolio", es: "Portafolio de Daniel León");
   static String get APP_TITLE => APP_NAME;
   static String get SITE_URL => "";
 
@@ -54,10 +54,11 @@ class StringConst {
   static String get WELCOME =>
       _localizedValue(en: "Hello, I'm Daniel", es: "Hola, soy Daniel");
   static String get INTRODUCTION => _localizedValue(
-      en: "Engineer with 3 years of experience in companies like:",
-      es: "Ingeniero con 3 años de experiencia en empresas como:");
+      en: "Engineer with more than 3 years of experience in companies like:",
+      es: "Ingeniero con más de 3 años de experiencia en empresas como:");
   static String get DESCRIPTION => _localizedValue(
-      en: "Bosch, Siemens and LeanCe", es: "Bosch, Siemens y LeanCe");
+      en: "Bosch, Siemens, LeanCe and IENTC",
+      es: "Bosch, Siemens, LeanCe e IENTC");
   static String get DESCRIPTION2 => _localizedValue(
         en: "Specialized in creating mobile and web applications to ensure continuous improvement in daily processes.",
         es: "Especializado en la creación de aplicaciones móviles y web para garantizar una mejora constante en los procesos diarios.",
@@ -286,6 +287,26 @@ class StringConst {
   static String get STARTED_MONTH_YEAR =>
       _localizedValue(en: "May 2017", es: "Mayo 2017");
 
+  // Empresa IENTC
+  static String get COMPANY_6 => "IENTC";
+  static String get COMPANY_6_URL => SITE_URL;
+  static String get POSITION_6 => _localizedValue(
+      en: "Software Developer",
+      es: "Desarrollador de Software");
+  static String get COMPANY_6_ROLE_1 => _localizedValue(
+      en: "Development and implementation of digital tools focused on customer contact, internal operation, and external technology projects.",
+      es: "Desarrollo e implementación de herramientas digitales enfocadas en el contacto con el cliente, la operación interna y proyectos tecnológicos externos.");
+  static String get COMPANY_6_ROLE_2 => _localizedValue(
+      en: "Participation in enterprise connectivity and telecommunications initiatives aligned with IENTC's business ecosystem.",
+      es: "Participación en iniciativas de conectividad empresarial y telecomunicaciones alineadas al ecosistema de negocio de IENTC.");
+  static String get COMPANY_6_ROLE_3 => _localizedValue(
+      en: "Creation of solutions for business processes, operational support, and customer-facing products, including web projects and internal applications.",
+      es: "Creación de soluciones para procesos de negocio, soporte operativo y productos orientados al cliente, incluyendo proyectos web y aplicaciones internas.");
+  static String get LOCATION_6 =>
+      _localizedValue(en: "Queretaro - Mexico", es: "Querétaro - México");
+  static String get DURATION_6 => _localizedValue(
+      en: "February 2025 - Present", es: "Febrero 2025 - Actualidad");
+
   // Empresa Refac
   static String get COMPANY_5 => "Refac";
   static String get COMPANY_5_URL => SITE_URL;
@@ -303,7 +324,7 @@ class StringConst {
   static String get LOCATION_5 =>
       _localizedValue(en: "Queretaro - Mexico", es: "Querétaro - México");
   static String get DURATION_5 => _localizedValue(
-      en: "January 2024 - Present", es: "Enero 2024 - Actualidad");
+      en: "2021 - Present", es: "2021 - Actualidad");
 
   // Empresa LeanCe Logistics
   static String get COMPANY_4 => "LeanCe Logistics";
@@ -322,7 +343,7 @@ class StringConst {
   static String get LOCATION_4 =>
       _localizedValue(en: "Queretaro - Mexico", es: "Querétaro - México");
   static String get DURATION_4 => _localizedValue(
-      en: "March 2024 - Present", es: "Marzo 2024 - Actualidad");
+      en: "March 2024 - February 2025", es: "Marzo 2024 - Febrero 2025");
 
   // Empresa Siemens
   static String get COMPANY_3 => "Siemens Querétaro";

@@ -35,12 +35,15 @@ class AboutHeader extends StatelessWidget {
       builder: (context, sizingInformation) {
         double screenWidth = sizingInformation.screenSize.width;
         if (screenWidth <= RefinedBreakpoints().tabletSmall) {
+          final double imageWidth = widthOfScreen(context);
+          final double imageHeight = imageWidth * 0.7;
+
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               AboutDescription(
                 controller: controller,
-                width: widthOfScreen(context),
+                width: imageWidth,
               ),
               SpaceH30(),
               ClipRRect(
@@ -48,8 +51,8 @@ class AboutHeader extends StatelessWidget {
                 child: Image.asset(
                   ImagePath.DEV,
                   fit: BoxFit.cover,
-                  width: widthOfScreen(context),
-                  height: assignHeight(context, 0.1),
+                  width: imageWidth,
+                  height: imageHeight,
                 ),
               ),
             ],

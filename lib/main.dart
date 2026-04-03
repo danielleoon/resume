@@ -6,7 +6,6 @@ import 'package:provider/provider.dart';
 import 'package:cv_daniel/app_theme.dart';
 import 'package:cv_daniel/presentation/pages/home/home_page.dart';
 import 'package:cv_daniel/presentation/routes/routes.dart';
-import 'package:cv_daniel/values/values.dart';
 import 'package:layout/layout.dart';
 import 'configure_web.dart';
 

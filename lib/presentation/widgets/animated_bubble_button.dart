@@ -57,9 +57,11 @@ class _AnimatedBubbleButtonState extends State<AnimatedBubbleButton>
   bool _isHovering = false;
   late AnimationController _controller;
   late Animation<Offset> _offsetAnimation;
+  late bool _ownsController;
 
   @override
   void initState() {
+    _ownsController = widget.controller == null;
     _controller = widget.controller ??
         AnimationController(
           vsync: this,
@@ -70,21 +72,21 @@ class _AnimatedBubbleButtonState extends State<AnimatedBubbleButton>
         Tween<Offset>(
           begin: widget.startOffset,
           end: widget.targetOffset,
-        ).animate(CurvedAnimation(parent: _controller, curve: widget.curve))
-      ..addListener(() {
-        setState(() {});
-      });
+        ).animate(CurvedAnimation(parent: _controller, curve: widget.curve));
     super.initState();
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    if (_ownsController) {
+      _controller.dispose();
+    }
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final bool disableAnimations = MediaQuery.maybeOf(context)?.disableAnimations ?? false;
     TextTheme textTheme = Theme.of(context).textTheme;
     TextStyle? buttonStyle = textTheme.bodyLarge?.copyWith(
       color: AppColors.accentColor,
@@ -117,7 +119,9 @@ class _AnimatedBubbleButtonState extends State<AnimatedBubbleButton>
       onEnter: widget.controlsOwnAnimation ? (e) => _mouseEnter(true) : null,
       onExit: widget.controlsOwnAnimation ? (e) => _mouseEnter(false) : null,
       child: SlideTransition(
-        position: _offsetAnimation,
+        position: disableAnimations
+            ? const AlwaysStoppedAnimation<Offset>(Offset.zero)
+            : _offsetAnimation,
         child: InkWell(
           hoverColor: Colors.transparent,
           onTap: widget.onTap,
@@ -128,7 +132,7 @@ class _AnimatedBubbleButtonState extends State<AnimatedBubbleButton>
               children: [
                 Positioned(
                   child: AnimatedContainer(
-                    duration: widget.duration,
+                    duration: disableAnimations ? Duration.zero : widget.duration,
                     width: (widget.hovering ?? _isHovering)
                         ? widget.targetWidth
                         : widget.startWidth,
@@ -174,6 +178,13 @@ class _AnimatedBubbleButtonState extends State<AnimatedBubbleButton>
   }
 
   void _mouseEnter(bool hovering) {
+    if (MediaQuery.maybeOf(context)?.disableAnimations ?? false) {
+      setState(() {
+        _isHovering = hovering;
+      });
+      return;
+    }
+
     if (hovering) {
       setState(() {
         _isHovering = hovering;

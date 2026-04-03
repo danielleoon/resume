@@ -115,9 +115,12 @@ class _NextProjectState extends State<NextProject>
                 SizedBox(
                   width: widthOfScreen(context),
                   height: assignHeight(context, 0.3),
-                  child: Image.asset(
-                    widget.nextProject.coverUrl,
-                    fit: BoxFit.cover,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.asset(
+                      widget.nextProject.coverUrl,
+                      fit: BoxFit.contain,
+                    ),
                   ),
                 ),
                 SpaceH30(),
@@ -233,11 +236,13 @@ class _NextProjectState extends State<NextProject>
                   child: SizedBox(
                     width: widget.width * 0.55,
                     height: assignHeight(context, 0.3),
-                    child: ScaleTransition(
-                      scale: scaleAnimation,
+                  child: ScaleTransition(
+                    scale: scaleAnimation,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
                       child: Image.asset(
                         widget.nextProject.coverUrl,
-                        fit: BoxFit.cover,
+                        fit: BoxFit.contain,
                         color: _isHovering ? Colors.transparent : Colors.grey,
                         colorBlendMode: _isHovering
                             ? BlendMode.color
@@ -245,6 +250,7 @@ class _NextProjectState extends State<NextProject>
                       ),
                     ),
                   ),
+                ),
                 ),
               ],
             ),

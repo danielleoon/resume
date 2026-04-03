@@ -36,6 +36,25 @@ class _AnimatedPositionedTextState extends State<AnimatedPositionedText> {
 
   @override
   void initState() {
+    super.initState();
+    _configureAnimation();
+  }
+
+  @override
+  void didUpdateWidget(covariant AnimatedPositionedText oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.controller != widget.controller ||
+        oldWidget.text != widget.text ||
+        oldWidget.textStyle != widget.textStyle ||
+        oldWidget.factor != widget.factor ||
+        oldWidget.maxLines != widget.maxLines ||
+        oldWidget.width != widget.width ||
+        oldWidget.relativeRect != widget.relativeRect) {
+      _configureAnimation();
+    }
+  }
+
+  void _configureAnimation() {
     setTextWidthAndHeight();
 
     textPositionAnimation = widget.relativeRect ??
@@ -49,8 +68,6 @@ class _AnimatedPositionedTextState extends State<AnimatedPositionedText> {
             Size(textWidth, textHeight),
           ),
         ).animate(widget.controller);
-
-    super.initState();
   }
 
   void setTextWidthAndHeight() {
@@ -61,7 +78,19 @@ class _AnimatedPositionedTextState extends State<AnimatedPositionedText> {
 
   @override
   Widget build(BuildContext context) {
-    setTextWidthAndHeight();
+    final bool disableAnimations = MediaQuery.maybeOf(context)?.disableAnimations ?? false;
+
+    if (disableAnimations) {
+      return SizedBox(
+        width: widget.width,
+        child: Text(
+          widget.text,
+          textAlign: widget.textAlign,
+          style: widget.textStyle,
+          maxLines: widget.maxLines,
+        ),
+      );
+    }
 
     return SizedBox(
       height: textHeight,
@@ -73,6 +102,7 @@ class _AnimatedPositionedTextState extends State<AnimatedPositionedText> {
               widget.text,
               textAlign: widget.textAlign,
               style: widget.textStyle,
+              maxLines: widget.maxLines,
             ),
           ),
         ],

@@ -35,6 +35,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   late AnimationController _recentWorksController;
   late AnimationController _slideTextController;
   late NavigationArguments _arguments;
+  bool _didLoadArguments = false;
+  bool _entranceAnimationsStarted = false;
 
   @override
   void initState() {
@@ -55,21 +57,41 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     super.initState();
   }
 
-  void getArguments() {
-    final Object? args = ModalRoute.of(context)!.settings.arguments;
-    // if page is being loaded for the first time, args will be null.
-    // if args is null, I set boolean values to run the appropriate animation
-    // In this case, if null run loading animation, if not null run the unveil animation
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_didLoadArguments) {
+      return;
+    }
+
+    final Object? args = ModalRoute.of(context)?.settings.arguments;
     if (args == null) {
       _arguments.showUnVeilPageAnimation = false;
     } else {
       _arguments = args as NavigationArguments;
+    }
+    _didLoadArguments = true;
+  }
+
+  void _startEntranceAnimations({required bool isCompactLayout}) {
+    if (_entranceAnimationsStarted) {
+      return;
+    }
+
+    _entranceAnimationsStarted = true;
+    _slideTextController.forward();
+
+    if (isCompactLayout &&
+        !_recentWorksController.isAnimating &&
+        !_recentWorksController.isCompleted) {
+      _recentWorksController.forward();
     }
   }
 
   @override
   void dispose() {
     _viewProjectsController.dispose();
+    _recentWorksController.dispose();
     _slideTextController.dispose();
     _scrollController.dispose();
     super.dispose();
@@ -77,7 +99,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    getArguments();
+    final bool isCompactLayout =
+        MediaQuery.sizeOf(context).width <= RefinedBreakpoints().tabletSmall;
     double projectItemHeight = assignHeight(context, 0.4);
     double subHeight = (3 / 4) * projectItemHeight;
     double extra = projectItemHeight - subHeight;
@@ -102,13 +125,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       hasSideTitle: false,
       hasUnveilPageAnimation: _arguments.showUnVeilPageAnimation,
       onLoadingAnimationDone: () {
-        _slideTextController.forward();
+        _startEntranceAnimations(isCompactLayout: isCompactLayout);
       },
       customLoadingAnimation: LoadingHomePageAnimation(
         text: StringConst.DEV_NAME,
         style: textTheme.headlineMedium!.copyWith(color: AppColors.white),
         onLoadingDone: () {
-          _slideTextController.forward();
+          _startEntranceAnimations(isCompactLayout: isCompactLayout);
         },
       ),
       child: ListView(
@@ -118,82 +141,48 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           parent: AlwaysScrollableScrollPhysics(),
         ),
         children: [
-          HomePageHeader(
-            controller: _slideTextController,
-            scrollToWorksKey: key,
-          ),
-          CustomSpacer(heightFactor: 0.1),
-          VisibilityDetector(
-            key: const Key('recent-projects'),
-            onVisibilityChanged: (visibilityInfo) {
-              double visiblePercentage = visibilityInfo.visibleFraction * 100;
-              if (visiblePercentage > 45) {
-                _recentWorksController.forward();
-              }
-            },
-            child: Container(
-              key: key,
-              margin: margin,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  AnimatedTextSlideBoxTransition(
-                    controller: _recentWorksController,
-                    text: StringConst.CRAFTED_WITH_LOVE,
-                    textStyle: textTheme.headlineMedium?.copyWith(
-                      color: AppColors.letterColor, //AQUI
-                      fontSize: responsiveSize(context, 30, 48, md: 40, sm: 36),
-                      height: 2.0,
-                    ),
-                  ),
-                  SpaceH16(),
-                  AnimatedPositionedText(
-                    controller: CurvedAnimation(
-                      parent: _recentWorksController,
-                      curve:
-                          const Interval(0.6, 1.0, curve: Curves.fastOutSlowIn),
-                    ),
-                    text: StringConst.SELECTION,
-                    textStyle: textTheme.bodyLarge?.copyWith(
-                      fontSize: responsiveSize(
-                        context,
-                        Sizes.TEXT_SIZE_16,
-                        Sizes.TEXT_SIZE_18,
-                      ),
-                      height: 2,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                ],
-              ),
+          RepaintBoundary(
+            child: HomePageHeader(
+              controller: _slideTextController,
+              scrollToWorksKey: key,
             ),
           ),
           CustomSpacer(heightFactor: 0.1),
-          ResponsiveBuilder(
-            builder: (context, sizingInformation) {
-              double screenWidth = sizingInformation.screenSize.width;
+          RepaintBoundary(
+            child: _buildRecentWorksSection(
+              context: context,
+              margin: margin,
+              isCompactLayout: isCompactLayout,
+            ),
+          ),
+          CustomSpacer(heightFactor: 0.1),
+          RepaintBoundary(
+            child: ResponsiveBuilder(
+              builder: (context, sizingInformation) {
+                double screenWidth = sizingInformation.screenSize.width;
 
-              if (screenWidth <= RefinedBreakpoints().tabletSmall) {
-                return Column(
-                  children: _buildProjectsForMobile(
-                    data: Data.recentWorks,
-                    projectHeight: projectItemHeight.toInt(),
-                    subHeight: subHeight.toInt(),
-                  ),
-                );
-              } else {
-                return SizedBox(
-                  height: (subHeight * (Data.recentWorks.length)) + extra,
-                  child: Stack(
-                    children: _buildRecentProjects(
+                if (screenWidth <= RefinedBreakpoints().tabletSmall) {
+                  return Column(
+                    children: _buildProjectsForMobile(
                       data: Data.recentWorks,
                       projectHeight: projectItemHeight.toInt(),
                       subHeight: subHeight.toInt(),
                     ),
-                  ),
-                );
-              }
-            },
+                  );
+                } else {
+                  return SizedBox(
+                    height: (subHeight * (Data.recentWorks.length)) + extra,
+                    child: Stack(
+                      children: _buildRecentProjects(
+                        data: Data.recentWorks,
+                        projectHeight: projectItemHeight.toInt(),
+                        subHeight: subHeight.toInt(),
+                      ),
+                    ),
+                  );
+                }
+              },
+            ),
           ),
           CustomSpacer(heightFactor: 0.05),
           Container(
@@ -322,5 +311,81 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       ));
     }
     return items;
+  }
+
+  Widget _buildRecentWorksSection({
+    required BuildContext context,
+    required EdgeInsets margin,
+    required bool isCompactLayout,
+  }) {
+    final Widget content = Container(
+      key: key,
+      margin: margin,
+      child: _RecentWorksHeader(
+        controller: _recentWorksController,
+      ),
+    );
+
+    if (isCompactLayout) {
+      return content;
+    }
+
+    return VisibilityDetector(
+      key: const Key('recent-projects'),
+      onVisibilityChanged: (visibilityInfo) {
+        final double visiblePercentage = visibilityInfo.visibleFraction * 100;
+        if (visiblePercentage > 18 &&
+            !_recentWorksController.isAnimating &&
+            !_recentWorksController.isCompleted) {
+          _recentWorksController.forward();
+        }
+      },
+      child: content,
+    );
+  }
+}
+
+class _RecentWorksHeader extends StatelessWidget {
+  const _RecentWorksHeader({
+    required this.controller,
+  });
+
+  final AnimationController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    final TextTheme textTheme = Theme.of(context).textTheme;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        AnimatedTextSlideBoxTransition(
+          controller: controller,
+          text: StringConst.CRAFTED_WITH_LOVE,
+          textStyle: textTheme.headlineMedium?.copyWith(
+            color: AppColors.letterColor,
+            fontSize: responsiveSize(context, 30, 48, md: 40, sm: 36),
+            height: 2.0,
+          ),
+        ),
+        SpaceH16(),
+        AnimatedPositionedText(
+          controller: CurvedAnimation(
+            parent: controller,
+            curve: const Interval(0.6, 1.0, curve: Curves.fastOutSlowIn),
+          ),
+          text: StringConst.SELECTION,
+          textStyle: textTheme.bodyLarge?.copyWith(
+            fontSize: responsiveSize(
+              context,
+              Sizes.TEXT_SIZE_16,
+              Sizes.TEXT_SIZE_18,
+            ),
+            height: 2,
+            fontWeight: FontWeight.w400,
+          ),
+        ),
+      ],
+    );
   }
 }

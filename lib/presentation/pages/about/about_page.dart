@@ -37,27 +37,27 @@ class _AboutPageState extends State<AboutPage> with TickerProviderStateMixin {
   @override
   void initState() {
     _controller = AnimationController(
-      duration: const Duration(milliseconds: 1200),
+      duration: Animations.slideAnimationDurationLong,
       vsync: this,
     );
     _storyController = AnimationController(
-      duration: const Duration(milliseconds: 1200),
+      duration: Animations.slideAnimationDurationLong,
       vsync: this,
     );
     _technologyController = AnimationController(
-      duration: const Duration(milliseconds: 1200),
+      duration: Animations.slideAnimationDurationLong,
       vsync: this,
     );
     _technologyListController = AnimationController(
-      duration: const Duration(milliseconds: 1200),
+      duration: Animations.slideAnimationDurationLong,
       vsync: this,
     );
     _contactController = AnimationController(
-      duration: const Duration(milliseconds: 1200),
+      duration: Animations.slideAnimationDurationLong,
       vsync: this,
     );
     _quoteController = AnimationController(
-      duration: const Duration(milliseconds: 1200),
+      duration: Animations.slideAnimationDurationLong,
       vsync: this,
     );
 
@@ -164,7 +164,9 @@ class _AboutPageState extends State<AboutPage> with TickerProviderStateMixin {
                       double visiblePercentage =
                           visibilityInfo.visibleFraction * 100;
                       if (visiblePercentage >
-                          responsiveSize(context, 40, 70, md: 50)) {
+                              responsiveSize(context, 12, 20, md: 16) &&
+                          !_storyController.isAnimating &&
+                          !_storyController.isCompleted) {
                         _storyController.forward();
                       }
                     },
@@ -208,7 +210,9 @@ class _AboutPageState extends State<AboutPage> with TickerProviderStateMixin {
                     onVisibilityChanged: (visibilityInfo) {
                       double visiblePercentage =
                           visibilityInfo.visibleFraction * 100;
-                      if (visiblePercentage > 50) {
+                      if (visiblePercentage > 16 &&
+                          !_technologyController.isAnimating &&
+                          !_technologyController.isCompleted) {
                         _technologyController.forward();
                       }
                     },
@@ -234,7 +238,9 @@ class _AboutPageState extends State<AboutPage> with TickerProviderStateMixin {
                         onVisibilityChanged: (visibilityInfo) {
                           double visiblePercentage =
                               visibilityInfo.visibleFraction * 100;
-                          if (visiblePercentage > 60) {
+                          if (visiblePercentage > 18 &&
+                              !_technologyListController.isAnimating &&
+                              !_technologyListController.isCompleted) {
                             _technologyListController.forward();
                           }
                         },
@@ -256,7 +262,9 @@ class _AboutPageState extends State<AboutPage> with TickerProviderStateMixin {
                     onVisibilityChanged: (visibilityInfo) {
                       double visiblePercentage =
                           visibilityInfo.visibleFraction * 100;
-                      if (visiblePercentage > 50) {
+                      if (visiblePercentage > 16 &&
+                          !_contactController.isAnimating &&
+                          !_contactController.isCompleted) {
                         _contactController.forward();
                       }
                     },
@@ -306,7 +314,9 @@ class _AboutPageState extends State<AboutPage> with TickerProviderStateMixin {
                     onVisibilityChanged: (visibilityInfo) {
                       double visiblePercentage =
                           visibilityInfo.visibleFraction * 100;
-                      if (visiblePercentage > 50) {
+                      if (visiblePercentage > 16 &&
+                          !_quoteController.isAnimating &&
+                          !_quoteController.isCompleted) {
                         _quoteController.forward();
                       }
                     },

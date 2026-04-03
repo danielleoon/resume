@@ -62,6 +62,8 @@ class _PageWrapperState extends State<PageWrapper>
   late AnimationController unveilPageSlideController;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
   Duration duration = const Duration(milliseconds: 1250);
+  String? _pendingRoute;
+  bool _reverseScheduled = false;
 
   @override
   void initState() {
@@ -73,21 +75,58 @@ class _PageWrapperState extends State<PageWrapper>
       vsync: this,
       duration: duration,
     );
+    forwardSlideController.addStatusListener(_handleForwardSlideStatus);
+    unveilPageSlideController.addStatusListener(_handleUnveilStatus);
 
     if (widget.hasUnveilPageAnimation) {
       unveilPageSlideController.forward();
-      unveilPageSlideController.addStatusListener((status) {
-        if (status == AnimationStatus.completed) {
-          widget.onLoadingAnimationDone?.call();
-        }
-      });
     }
 
     super.initState();
   }
 
+  void _handleForwardSlideStatus(AnimationStatus status) {
+    if (status == AnimationStatus.completed) {
+      final String? route = _pendingRoute;
+      if (route != null) {
+        _pendingRoute = null;
+        Navigator.of(context).pushNamed(
+          route,
+          arguments: NavigationArguments(
+            showUnVeilPageAnimation: true,
+          ),
+        );
+      }
+    } else if (status == AnimationStatus.dismissed) {
+      _reverseScheduled = false;
+    }
+  }
+
+  void _handleUnveilStatus(AnimationStatus status) {
+    if (status == AnimationStatus.completed) {
+      widget.onLoadingAnimationDone?.call();
+    }
+  }
+
+  void _scheduleReverseIfNeeded() {
+    if (!widget.reverseAnimationOnPop ||
+        forwardSlideController.status != AnimationStatus.completed ||
+        _reverseScheduled) {
+      return;
+    }
+
+    _reverseScheduled = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && forwardSlideController.isCompleted) {
+        forwardSlideController.reverse();
+      }
+    });
+  }
+
   @override
   void dispose() {
+    forwardSlideController.removeStatusListener(_handleForwardSlideStatus);
+    unveilPageSlideController.removeStatusListener(_handleUnveilStatus);
     forwardSlideController.dispose();
     unveilPageSlideController.dispose();
     super.dispose();
@@ -95,11 +134,7 @@ class _PageWrapperState extends State<PageWrapper>
 
   @override
   Widget build(BuildContext context) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (forwardSlideController.isCompleted && widget.reverseAnimationOnPop) {
-        forwardSlideController.reverse();
-      }
-    });
+    _scheduleReverseIfNeeded();
 
     return Consumer<LanguageProvider>(
       builder: (context, languageProvider, _) {
@@ -113,7 +148,7 @@ class _PageWrapperState extends State<PageWrapper>
           ),
           body: Stack(
             children: [
-              widget.child,
+              RepaintBoundary(child: widget.child),
               navBarWidget.NavBar(
                 selectedRouteTitle: widget.selectedPageName,
                 controller: widget.navBarAnimationController,
@@ -123,17 +158,14 @@ class _PageWrapperState extends State<PageWrapper>
                 titleColor: widget.navBarTitleColor,
                 selectedTitleColor: widget.navBarSelectedTitleColor,
                 onNavItemWebTap: (String route) {
-                  forwardSlideController.forward();
-                  forwardSlideController.addStatusListener((status) {
-                    if (status == AnimationStatus.completed) {
-                      Navigator.of(context).pushNamed(
-                        route,
-                        arguments: NavigationArguments(
-                          showUnVeilPageAnimation: true,
-                        ),
-                      );
-                    }
-                  });
+                  if (route == widget.selectedRoute) {
+                    return;
+                  }
+
+                  _pendingRoute = route;
+                  if (!forwardSlideController.isAnimating) {
+                    forwardSlideController.forward(from: 0);
+                  }
                 },
                 onMenuTap: () {
                   if (_scaffoldKey.currentState!.isEndDrawerOpen) {

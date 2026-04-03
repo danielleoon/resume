@@ -1,14 +1,17 @@
 import 'package:cv_daniel/core/layout/adaptive.dart';
+import 'package:cv_daniel/core/utils/functions.dart';
 import 'package:cv_daniel/presentation/pages/home/home_page.dart';
 import 'package:cv_daniel/presentation/pages/widgets/socials.dart';
 import 'package:cv_daniel/presentation/widgets/app_logo.dart';
 import 'package:cv_daniel/presentation/widgets/nav_item.dart';
 import 'package:cv_daniel/presentation/widgets/page_wrapper.dart';
 import 'package:cv_daniel/presentation/widgets/spaces.dart';
+import 'package:cv_daniel/providers/language.dart';
 import 'package:cv_daniel/values/strings.dart';
 import 'package:cv_daniel/values/values.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
+import 'package:provider/provider.dart';
 
 class AppDrawer extends StatefulWidget {
   const AppDrawer({
@@ -128,6 +131,8 @@ class _AppDrawerState extends State<AppDrawer>
                         SizedBox(height: 20), // Espacio al inicio de la lista
                         ..._buildMenuList(
                             menuList: widget.menuList, context: context),
+                        SpaceH30(),
+                        _buildDrawerActions(context),
                         SizedBox(height: 20), // Espacio al final de la lista
                       ],
                     ),
@@ -213,5 +218,156 @@ class _AppDrawerState extends State<AppDrawer>
       );
     }
     return menuItems;
+  }
+
+  Widget _buildDrawerActions(BuildContext context) {
+    final TextTheme textTheme = Theme.of(context).textTheme;
+
+    return Consumer<LanguageProvider>(
+      builder: (context, languageProvider, _) {
+        final double actionWidth = responsiveSize(
+          context,
+          widthOfScreen(context) * 0.62,
+          260,
+          md: 280,
+        );
+
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: Sizes.PADDING_24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Text(
+                  "Idioma",
+                  textAlign: TextAlign.center,
+                  style: textTheme.bodyLarge?.copyWith(
+                    color: AppColors.grey500,
+                    fontSize: Sizes.TEXT_SIZE_14,
+                    letterSpacing: 1.2,
+                  ),
+                ),
+              ),
+              SpaceH12(),
+              Center(
+                child: Container(
+                  width: actionWidth,
+                  height: 52,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  decoration: BoxDecoration(
+                    color: AppColors.letterColor,
+                    border: Border.all(color: AppColors.grey700),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      value: languageProvider.locale.languageCode,
+                      isExpanded: true,
+                      icon: const Icon(
+                        FeatherIcons.chevronDown,
+                        color: AppColors.accentColor,
+                        size: 18,
+                      ),
+                      dropdownColor: AppColors.letterColor,
+                      borderRadius: BorderRadius.circular(14),
+                      style: textTheme.bodyLarge?.copyWith(
+                        color: AppColors.grey300,
+                        fontSize: Sizes.TEXT_SIZE_16,
+                        fontWeight: FontWeight.w400,
+                      ),
+                      selectedItemBuilder: (context) => const [
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            'Español',
+                            style: TextStyle(
+                              color: AppColors.grey300,
+                              fontSize: Sizes.TEXT_SIZE_16,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            'English',
+                            style: TextStyle(
+                              color: AppColors.grey300,
+                              fontSize: Sizes.TEXT_SIZE_16,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ),
+                      ],
+                      onChanged: (value) {
+                        if (value == null) {
+                          return;
+                        }
+
+                        languageProvider.setLanguage(value);
+                        final currentRoute =
+                            ModalRoute.of(context)?.settings.name ?? '/';
+                        Navigator.pushReplacementNamed(context, currentRoute);
+                      },
+                      items: const [
+                        DropdownMenuItem(
+                          value: 'es',
+                          child: Text('Español'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'en',
+                          child: Text('English'),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              SpaceH20(),
+              Center(
+                child: InkWell(
+                  onTap: () {
+                    Functions.downloadFromAssets(
+                      "Resume_Jose_Daniel_Leon_Sanchez_2025.pdf",
+                      "Resume_Jose_Daniel_Leon_Sanchez_2025.pdf",
+                    );
+                  },
+                  hoverColor: Colors.transparent,
+                  child: Container(
+                    width: actionWidth,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 14),
+                    decoration: BoxDecoration(
+                      color: AppColors.letterColor,
+                      border: Border.all(color: AppColors.grey700),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          FeatherIcons.download,
+                          color: AppColors.accentColor,
+                          size: 18,
+                        ),
+                        SpaceW12(),
+                        Text(
+                          StringConst.DOWNLOAD.toUpperCase(),
+                          style: textTheme.bodyLarge?.copyWith(
+                            color: AppColors.accentColor,
+                            fontSize: Sizes.TEXT_SIZE_16,
+                            fontWeight: FontWeight.w500,
+                            letterSpacing: 1.1,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 }

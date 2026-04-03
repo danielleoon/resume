@@ -48,7 +48,6 @@ class _LoadingHomePageAnimationState extends State<LoadingHomePageAnimation>
   bool _isAnimationOver = false;
   late Size size;
   late double textWidth;
-  late double textHeight;
 
   @override
   void initState() {
@@ -94,9 +93,7 @@ class _LoadingHomePageAnimationState extends State<LoadingHomePageAnimation>
     _scaleOpacityController.forward();
     _scaleOpacityController.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
-        setState(() {
-          _containerController.forward();
-        });
+        _containerController.forward();
       }
     });
     _containerController.addStatusListener((status) {
@@ -131,12 +128,18 @@ class _LoadingHomePageAnimationState extends State<LoadingHomePageAnimation>
       style: widget.style,
     );
     textWidth = size.width;
-    textHeight = size.height;
+  }
+
+  @override
+  void didUpdateWidget(covariant LoadingHomePageAnimation oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.text != widget.text || oldWidget.style != widget.style) {
+      setTextWidthAndHeight();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    setTextWidthAndHeight();
     double screenWidth = widthOfScreen(context);
     double screenHeight = heightOfScreen(context);
     double halfHeightOfScreen = screenHeight / 2;

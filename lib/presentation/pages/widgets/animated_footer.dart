@@ -78,7 +78,9 @@ class _AnimatedFooterState extends State<AnimatedFooter>
         key: const Key('animated-footer'),
         onVisibilityChanged: (visibilityInfo) {
           double visiblePercentage = visibilityInfo.visibleFraction * 100;
-          if (visiblePercentage > 25) {
+          if (visiblePercentage > 10 &&
+              !controller.isAnimating &&
+              !controller.isCompleted) {
             controller.forward();
           }
         },
