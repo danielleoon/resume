@@ -12,6 +12,8 @@ import 'package:cv_daniel/presentation/widgets/page_wrapper.dart';
 import 'package:cv_daniel/presentation/widgets/project_item.dart';
 import 'package:cv_daniel/presentation/widgets/spaces.dart';
 import 'package:cv_daniel/values/strings.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:cv_daniel/values/values.dart';
 import 'package:responsive_builder/responsive_builder.dart';
@@ -101,6 +103,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     final bool isCompactLayout =
         MediaQuery.sizeOf(context).width <= RefinedBreakpoints().tabletSmall;
+    final bool useDesktopScrollPhysics = kIsWeb || !isDisplayMobile(context);
     double projectItemHeight = assignHeight(context, 0.4);
     double subHeight = (3 / 4) * projectItemHeight;
     double extra = projectItemHeight - subHeight;
@@ -134,111 +137,118 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           _startEntranceAnimations(isCompactLayout: isCompactLayout);
         },
       ),
-      child: ListView(
-        padding: EdgeInsets.zero,
-        controller: _scrollController,
-        physics: const BouncingScrollPhysics(
-          parent: AlwaysScrollableScrollPhysics(),
-        ),
-        children: [
-          RepaintBoundary(
-            child: HomePageHeader(
-              controller: _slideTextController,
-              scrollToWorksKey: key,
+      child: ScrollConfiguration(
+        behavior: const _HomePageScrollBehavior(),
+        child: ListView(
+          padding: EdgeInsets.zero,
+          controller: _scrollController,
+          cacheExtent: assignHeight(context, 1.2),
+          physics: useDesktopScrollPhysics
+              ? const ClampingScrollPhysics()
+              : const BouncingScrollPhysics(
+                  parent: AlwaysScrollableScrollPhysics(),
+                ),
+          children: [
+            RepaintBoundary(
+              child: HomePageHeader(
+                controller: _slideTextController,
+                scrollToWorksKey: key,
+              ),
             ),
-          ),
-          CustomSpacer(heightFactor: 0.1),
-          RepaintBoundary(
-            child: _buildRecentWorksSection(
-              context: context,
-              margin: margin,
-              isCompactLayout: isCompactLayout,
+            CustomSpacer(heightFactor: 0.1),
+            RepaintBoundary(
+              child: _buildRecentWorksSection(
+                context: context,
+                margin: margin,
+                isCompactLayout: isCompactLayout,
+              ),
             ),
-          ),
-          CustomSpacer(heightFactor: 0.1),
-          RepaintBoundary(
-            child: ResponsiveBuilder(
-              builder: (context, sizingInformation) {
-                double screenWidth = sizingInformation.screenSize.width;
+            CustomSpacer(heightFactor: 0.1),
+            RepaintBoundary(
+              child: ResponsiveBuilder(
+                builder: (context, sizingInformation) {
+                  double screenWidth = sizingInformation.screenSize.width;
 
-                if (screenWidth <= RefinedBreakpoints().tabletSmall) {
-                  return Column(
-                    children: _buildProjectsForMobile(
-                      data: Data.recentWorks,
-                      projectHeight: projectItemHeight.toInt(),
-                      subHeight: subHeight.toInt(),
-                    ),
-                  );
-                } else {
-                  return SizedBox(
-                    height: (subHeight * (Data.recentWorks.length)) + extra,
-                    child: Stack(
-                      children: _buildRecentProjects(
+                  if (screenWidth <= RefinedBreakpoints().tabletSmall) {
+                    return Column(
+                      children: _buildProjectsForMobile(
                         data: Data.recentWorks,
                         projectHeight: projectItemHeight.toInt(),
                         subHeight: subHeight.toInt(),
                       ),
-                    ),
-                  );
-                }
-              },
+                    );
+                  } else {
+                    return SizedBox(
+                      height: (subHeight * (Data.recentWorks.length)) + extra,
+                      child: Stack(
+                        children: _buildRecentProjects(
+                          data: Data.recentWorks,
+                          projectHeight: projectItemHeight.toInt(),
+                          subHeight: subHeight.toInt(),
+                        ),
+                      ),
+                    );
+                  }
+                },
+              ),
             ),
-          ),
-          CustomSpacer(heightFactor: 0.05),
-          Container(
-            margin: margin,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  StringConst.THERES_MORE.toUpperCase(),
-                  style: textTheme.bodyLarge?.copyWith(
-                    fontSize: responsiveSize(context, 11, Sizes.TEXT_SIZE_12),
-                    letterSpacing: 2,
-                    fontWeight: FontWeight.w300,
+            CustomSpacer(heightFactor: 0.05),
+            Container(
+              margin: margin,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    StringConst.THERES_MORE.toUpperCase(),
+                    style: textTheme.bodyLarge?.copyWith(
+                      fontSize: responsiveSize(context, 11, Sizes.TEXT_SIZE_12),
+                      letterSpacing: 2,
+                      fontWeight: FontWeight.w300,
+                    ),
                   ),
-                ),
-                SpaceH16(),
-                MouseRegion(
-                  onEnter: (e) => _viewProjectsController.forward(),
-                  onExit: (e) => _viewProjectsController.reverse(),
-                  child: AnimatedSlideTranstion(
-                    controller: _viewProjectsController,
-                    beginOffset: const Offset(0, 0),
-                    targetOffset: const Offset(0.05, 0),
-                    child: TextButton(
-                      onPressed: () {
-                        Navigator.pushNamed(context, WorksPage.worksPageRoute);
-                      },
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            StringConst.VIEW_ALL_PROJECTS.toLowerCase(),
-                            style: textButtonStyle,
-                          ),
-                          SpaceW12(),
-                          Container(
-                            margin: EdgeInsets.only(
-                                top: textButtonStyle!.fontSize! / 2),
-                            child: Image.asset(
-                              ImagePath.ARROW_RIGHT,
-                              width: 25,
+                  SpaceH16(),
+                  MouseRegion(
+                    onEnter: (e) => _viewProjectsController.forward(),
+                    onExit: (e) => _viewProjectsController.reverse(),
+                    child: AnimatedSlideTranstion(
+                      controller: _viewProjectsController,
+                      beginOffset: const Offset(0, 0),
+                      targetOffset: const Offset(0.05, 0),
+                      child: TextButton(
+                        onPressed: () {
+                          Navigator.pushNamed(
+                              context, WorksPage.worksPageRoute);
+                        },
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              StringConst.VIEW_ALL_PROJECTS.toLowerCase(),
+                              style: textButtonStyle,
                             ),
-                          ),
-                        ],
+                            SpaceW12(),
+                            Container(
+                              margin: EdgeInsets.only(
+                                  top: textButtonStyle!.fontSize! / 2),
+                              child: Image.asset(
+                                ImagePath.ARROW_RIGHT,
+                                width: 25,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          CustomSpacer(heightFactor: 0.15),
-          AnimatedFooter(),
-        ],
+            CustomSpacer(heightFactor: 0.15),
+            AnimatedFooter(),
+          ],
+        ),
       ),
     );
   }
@@ -342,6 +352,28 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       },
       child: content,
     );
+  }
+}
+
+class _HomePageScrollBehavior extends MaterialScrollBehavior {
+  const _HomePageScrollBehavior();
+
+  @override
+  Set<PointerDeviceKind> get dragDevices => {
+        PointerDeviceKind.touch,
+        PointerDeviceKind.mouse,
+        PointerDeviceKind.trackpad,
+        PointerDeviceKind.stylus,
+        PointerDeviceKind.unknown,
+      };
+
+  @override
+  Widget buildScrollbar(
+    BuildContext context,
+    Widget child,
+    ScrollableDetails details,
+  ) {
+    return child;
   }
 }
 

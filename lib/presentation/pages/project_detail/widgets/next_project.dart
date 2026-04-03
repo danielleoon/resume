@@ -64,6 +64,43 @@ class _NextProjectState extends State<NextProject>
     }
   }
 
+  Widget _buildProjectTitle(
+    BuildContext context, {
+    required TextStyle? style,
+    required bool isHovered,
+  }) {
+    final Color titleColor =
+        isHovered ? widget.nextProject.primaryColor : AppColors.black;
+
+    return AnimatedDefaultTextStyle(
+      duration: Animations.switcherDuration,
+      curve: Curves.easeOutCubic,
+      style: (style ?? const TextStyle()).copyWith(
+        color: titleColor,
+        fontWeight: FontWeight.w600,
+        height: 1.02,
+        shadows: const [
+          Shadow(
+            color: Color(0x26FFFFFF),
+            offset: Offset(0, 1),
+            blurRadius: 0,
+          ),
+          Shadow(
+            color: Color(0x1A000000),
+            offset: Offset(0, 6),
+            blurRadius: 18,
+          ),
+        ],
+      ),
+      child: Text(
+        widget.nextProject.title,
+        textAlign: TextAlign.left,
+        maxLines: 2,
+        overflow: TextOverflow.visible,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     TextTheme textTheme = Theme.of(context).textTheme;
@@ -86,6 +123,8 @@ class _NextProjectState extends State<NextProject>
     TextStyle? projectTitleStyle = textTheme.titleMedium?.copyWith(
       color: AppColors.black,
       fontSize: projectTitleFontSize,
+      fontWeight: FontWeight.w600,
+      letterSpacing: -1.2,
     );
     return ResponsiveBuilder(
       builder: (context, sizingInformation) {
@@ -106,10 +145,10 @@ class _NextProjectState extends State<NextProject>
                   ),
                 ),
                 SpaceH20(),
-                Text(
-                  widget.nextProject.title,
-                  textAlign: TextAlign.center,
+                _buildProjectTitle(
+                  context,
                   style: projectTitleStyle,
+                  isHovered: false,
                 ),
                 SpaceH20(),
                 SizedBox(
@@ -176,39 +215,21 @@ class _NextProjectState extends State<NextProject>
                             ),
                             SpaceH20(),
                             isDisplayMobileOrTablet(context)
-                                ? Text(
-                                    widget.nextProject.title,
-                                    textAlign: TextAlign.center,
+                                ? _buildProjectTitle(
+                                    context,
                                     style: projectTitleStyle,
+                                    isHovered: false,
                                   )
                                 : AnimatedSwitcher(
                                     duration: Animations.switcherDuration,
-                                    child: _isHovering
-                                        ? Text(
-                                            widget.nextProject.title,
-                                            textAlign: TextAlign.center,
-                                            style: projectTitleStyle,
-                                          )
-                                        : Stack(
-                                            children: [
-                                              Text(
-                                                widget.nextProject.title,
-                                                textAlign: TextAlign.center,
-                                                style: projectTitleStyle,
-                                              ),
-                                              Text(
-                                                widget.nextProject.title,
-                                                textAlign: TextAlign.center,
-                                                style:
-                                                    projectTitleStyle?.copyWith(
-                                                  color: AppColors.white,
-                                                  fontSize:
-                                                      projectTitleFontSize -
-                                                          0.25,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
+                                    child: KeyedSubtree(
+                                      key: ValueKey(_isHovering),
+                                      child: _buildProjectTitle(
+                                        context,
+                                        style: projectTitleStyle,
+                                        isHovered: _isHovering,
+                                      ),
+                                    ),
                                   ),
                           ],
                         ),

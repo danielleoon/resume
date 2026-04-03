@@ -197,6 +197,11 @@ class Data {
 
   static List<SocialData> socialData2 = [
     SocialData(
+      name: StringConst.GITHUB,
+      iconData: FontAwesomeIcons.github,
+      url: StringConst.GITHUB_URL,
+    ),
+    SocialData(
       name: StringConst.LINKED_IN,
       iconData: FontAwesomeIcons.linkedin,
       url: StringConst.LINKED_IN_URL,
@@ -594,6 +599,8 @@ class Projects {
     portfolioDescription: StringConst.REFAC_DETAIL,
     isPublic: false,
     isOnPlayStore: false,
+    isLive: true,
+    webUrl: "https://refac.mx",
     technologyUsed: StringConst.FLUTTER,
   );
 
@@ -663,8 +670,6 @@ class Projects {
     isPublic: false,
     isOnPlayStore: false,
     technologyUsed: StringConst.FLUTTER,
-    gitHubUrl: StringConst.BOSCH_CERT_GITHUB_URL,
-    playStoreUrl: StringConst.BOSCH_CERT_PLAYSTORE_URL,
   );
 
   static ProjectItemData LOGIN_CATALOG = ProjectItemData(

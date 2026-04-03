@@ -67,6 +67,10 @@ class _ContactPageState extends State<ContactPage>
   @override
   void dispose() {
     _controller.dispose();
+    _nameController.dispose();
+    _emailController.dispose();
+    _subjectController.dispose();
+    _messageController.dispose();
     super.dispose();
   }
 
@@ -74,28 +78,19 @@ class _ContactPageState extends State<ContactPage>
     return _nameFilled && _subjectFilled && _messageFilled && _emailFilled;
   }
 
-//aqui
   Future<void> sendEmail() async {
     if (isFormValid()) {
-      setState(() {
-        // isSendingEmail = true;
-      });
-      final String email = 'daniel.leon07@hotmail.com';
-      final String subject = _subjectController.text;
-      final String body = _messageController.text;
-
       final Uri emailUri = Uri(
         scheme: 'mailto',
-        path: email,
+        path: StringConst.DEV_EMAIL,
         query:
-            'subject=$subject&body=$body', // Puedes añadir más parámetros si lo deseas
+            'subject=${Uri.encodeComponent(_buildEmailSubject())}&body=${Uri.encodeComponent(_buildEmailBody())}',
       );
 
-      // Intentar abrir la app de correo con los datos predefinidos
-      if (await canLaunch(emailUri.toString())) {
-        await launch(emailUri.toString());
+      if (await canLaunchUrl(emailUri)) {
+        await launchUrl(emailUri);
       } else {
-        throw 'No se pudo abrir la aplicación de correo';
+        throw 'No se pudo abrir la aplicación de correo.';
       }
     } else {
       isNameValid(_nameController.text);
@@ -372,5 +367,34 @@ class _ContactPageState extends State<ContactPage>
     _emailController.text = "";
     _subjectController.text = "";
     _messageController.text = "";
+  }
+
+  String _buildEmailSubject() {
+    final String trimmedSubject = _subjectController.text.trim();
+    return 'Contacto desde portafolio | $trimmedSubject';
+  }
+
+  String _buildEmailBody() {
+    final String name = _nameController.text.trim();
+    final String email = _emailController.text.trim();
+    final String subject = _subjectController.text.trim();
+    final String message = _messageController.text.trim();
+
+    return '''
+Hola Daniel,
+
+Te escribo desde tu portafolio porque me gustaria contactarte.
+
+Mis datos
+- Nombre: $name
+- Correo: $email
+- Asunto: $subject
+
+Mensaje:
+$message
+
+---
+Quedo atento(a) a tu respuesta.
+''';
   }
 }
