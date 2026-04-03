@@ -310,7 +310,7 @@ class _AboutDevState extends State<AboutDev> {
             ),
           ),
         ),
-        SpaceH30(),
+        SpaceH16(),
         Container(
           margin: margin,
           child: AnimatedTextSlideBoxTransition(
@@ -351,14 +351,14 @@ class _AboutDevState extends State<AboutDev> {
             // Ajustar el ancho del contenedor según el tamaño de pantalla
             double containerWidth = responsiveSize(
               context,
-              widget.width * .70,
-              widget.width * .70,
-              md: widget.width * .70,
+              widget.width * .82,
+              widget.width * .82,
+              md: widget.width * .78,
               sm: widget.width * .70,
             );
 
             MainAxisAlignment rowAlignment = screenWidth > 600
-                ? MainAxisAlignment.start
+                ? MainAxisAlignment.spaceBetween
                 : MainAxisAlignment.center;
 
             return Padding(
@@ -371,14 +371,14 @@ class _AboutDevState extends State<AboutDev> {
                     Flexible(
                       child: _AnimatedCompanyLogo(
                         controller: widget.controller,
-                        width: containerWidth / 3,
+                        width: containerWidth / 3.6,
                         delayStart: 0.50,
-                        delayEnd: 0.80,
+                        delayEnd: 0.78,
                         child: Padding(
                           padding: const EdgeInsets.all(12),
                           child: Image.asset(
                             ImagePath.BOSCH_LOGO,
-                            width: containerWidth / 3,
+                            width: containerWidth / 3.6,
                           ),
                         ),
                       ),
@@ -386,14 +386,14 @@ class _AboutDevState extends State<AboutDev> {
                     Flexible(
                       child: _AnimatedCompanyLogo(
                         controller: widget.controller,
-                        width: containerWidth / 3,
-                        delayStart: 0.58,
-                        delayEnd: 0.88,
+                        width: containerWidth / 3.6,
+                        delayStart: 0.56,
+                        delayEnd: 0.84,
                         child: Padding(
                           padding: const EdgeInsets.all(10),
                           child: Image.asset(
                             ImagePath.SIEMENS_LOGO,
-                            width: containerWidth / 3,
+                            width: containerWidth / 3.6,
                           ),
                         ),
                       ),
@@ -401,14 +401,29 @@ class _AboutDevState extends State<AboutDev> {
                     Flexible(
                       child: _AnimatedCompanyLogo(
                         controller: widget.controller,
-                        width: containerWidth / 3,
-                        delayStart: 0.66,
-                        delayEnd: 0.96,
+                        width: containerWidth / 3.6,
+                        delayStart: 0.62,
+                        delayEnd: 0.90,
                         child: Padding(
                           padding: const EdgeInsets.all(12),
                           child: Image.asset(
                             ImagePath.LEANCE_LOGO,
-                            width: containerWidth / 3,
+                            width: containerWidth / 3.6,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Flexible(
+                      child: _AnimatedCompanyLogo(
+                        controller: widget.controller,
+                        width: containerWidth / 3.6,
+                        delayStart: 0.68,
+                        delayEnd: 0.96,
+                        child: Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: Image.asset(
+                            ImagePath.IENTC_LOGO,
+                            width: containerWidth / 3.6,
                           ),
                         ),
                       ),
