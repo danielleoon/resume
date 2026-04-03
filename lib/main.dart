@@ -24,11 +24,7 @@ void main() async {
 ///TODO follow instructions
 ///
 ///update cv pfd and try
-///
 ///upload projects
-///
-///uploas IENTC logo
-///
 ///transalte projects
 
 class Aerium extends StatelessWidget {
