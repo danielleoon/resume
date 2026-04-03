@@ -55,6 +55,12 @@ class ImagePath {
   static const String NOUMI_1 = "$projectsDir/noumi/noumi_1.png";
   static const String NOUMI_2 = "$projectsDir/noumi/noumi_2.png";
 
+  // LULUNET SALES
+  static const String LULUNET_SALES_1 =
+      "$projectsDir/lulunet_sales/lulunet_sales_1.png";
+  static const String LULUNET_SALES_2 =
+      "$projectsDir/lulunet_sales/lulunet_sales_2.png";
+
   // LEANCEPREV
   static const String LEANCEPREV_COVER =
       "$projectsDir/LEANCEPREV/LEANCEPREV_COVER.png";
@@ -165,4 +171,5 @@ class ImagePath {
   static const String BOSCH_LOGO = "$imageDir/bosch_logo.png";
   static const String SIEMENS_LOGO = "$imageDir/siemens_logo.png";
   static const String LEANCE_LOGO = "$imageDir/leance_logo.png";
+  static const String IENTC_LOGO = "$imageDir/ientc_logo.png";
 }
