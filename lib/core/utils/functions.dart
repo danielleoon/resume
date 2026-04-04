@@ -12,18 +12,19 @@ class Functions {
 
   static Future<void> downloadFromAssets(
       String assetPath, String downloadFileName) async {
-    // Cargar el archivo como bytes
     final ByteData data = await rootBundle.load(assetPath);
     final List<int> bytes = data.buffer.asUint8List();
 
-    // Crear un blob y URL de descarga
     final blob = html.Blob([bytes]);
     final url = html.Url.createObjectUrlFromBlob(blob);
 
-    // Crear un elemento <a> para iniciar la descarga
-// Simular el clic para iniciar la descarga
+    final anchor = html.AnchorElement(href: url)
+      ..setAttribute('download', downloadFileName)
+      ..style.display = 'none';
 
-    // Liberar la URL creada
+    html.document.body?.children.add(anchor);
+    anchor.click();
+    anchor.remove();
     html.Url.revokeObjectUrl(url);
   }
 
